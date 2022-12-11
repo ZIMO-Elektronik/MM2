@@ -17,7 +17,7 @@ namespace mm2::rx {
 
 template<typename T>
 concept Writable = requires(T t, uint32_t addr, uint8_t value) {
-                     { t.writeCv(addr, value) } -> std::convertible_to<uint8_t>;
-                   };
+  { t.writeCv(addr, value) } -> std::convertible_to<uint8_t>;
+};
 
 }  // namespace mm2::rx

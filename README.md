@@ -2,7 +2,7 @@
 
 <img src="data/images/logo.png" width="10%" align="right">
 
-MM2 is an implementation of the Motorola 1 and 2 (MM1/2) protocol. Details on the format can be found on [Dr. König's Märklin-Digital-Page](http://www.drkoenig.de/digital/digital.htm) or in the data folder in case this site goes offline. This library supports MM1 and 2 as well as some additions like CV programming and follow-up addresses for supporting more than 5 functions.
+MM2 is an implementation of the Motorola 1 and 2 (MM1/2) protocol. Details on the format can be found on [Dr. König's Märklin-Digital-Page](http://www.drkoenig.de/digital/digital.htm) or in the [docs](/docs) folder in case this site goes offline. This library supports MM1 and 2 as well as some additions like CV programming and follow-up addresses for supporting more than 5 functions.
 
 ## Examples
 Currently there is only one class for receiving MM2.
