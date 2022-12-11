@@ -1,0 +1,550 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<title>Dr. König´s Märklin-Digital-Page: Verbesserung des
+Systems/Datenformats | von Dr. Michael König (Dr. König - Dr. Koenig) |
+Modelleisenbahn - Märklin (Märklin - Maerklin) - Digital</title><!-- --><script charset="utf-8" id="injection_graph_func" src="Motorola_Format_Verbesserungen-Dateien/injection_graph_func.js"></script><script id="_nameHighlight_injection"></script><link class="skype_name_highlight_style" href="Motorola_Format_Verbesserungen-Dateien/injection_nh_graph.css" type="text/css" rel="stylesheet" charset="utf-8" id="_injection_graph_nh_css"><link href="Motorola_Format_Verbesserungen-Dateien/skypeplugin_dropdownmenu.css" type="text/css" rel="stylesheet" charset="utf-8" id="_skypeplugin_dropdownmenu_css"></head><body background="Motorola_Format_Verbesserungen-Dateien/back3.gif"><!-- --><script src="Motorola_Format_Verbesserungen-Dateien/home.js"></script>
+
+<!--hr-->
+<font size="4">
+</font><center><font size="4"><img src="Motorola_Format_Verbesserungen-Dateien/bahn7.gif" align="middle" border="0"></font></center><font size="4"><br>
+</font><center><h3><font size="4"><img src="Motorola_Format_Verbesserungen-Dateien/mk2.gif" alt="Dr. König´s Märklin-Digital-Page" height="32" width="376"></font></h3></center>
+<p>
+</p><center><font size="4"><img src="Motorola_Format_Verbesserungen-Dateien/bahn8.gif" border="0"></font></center><font size="4"><br>
+<a name="edits1"></a></font><center><h2><font size="4"><font size="+3">Verbesserung des Systems/Datenformats</font></font></h2></center>
+<center><font size="4"><img src="Motorola_Format_Verbesserungen-Dateien/aktie.gif" align="center" height="301" width="726"></font></center>
+<p>
+</p><h3><font size="4"><font size="+2">Mehr Adressen ....</font></font></h3>
+<font size="4">würden sich manche Anwender wünschen, denn die magische
+Zahl von 80 bzw. 81 Loks kann doch überraschend schnell erreicht sein,
+wenn das Eisenbahn-Bazillus so richtig zuschlägt. Die "offizielle"
+Beschränkung des Adreßumfangs auf 80 bzw. 81 Adressen stört daher
+etwas, zumal sie weder zeitgemäß noch technisch zwingend ist.
+</font><p>
+<font size="4">Dies läßt sich relativ durch eine sachgerechte
+Erweiterung des Datenformats beheben. Zum besseren Verständnis sollte
+noch einmal die <a href="http://home.arcor.de/dr.koenig/digital/motoueb.htm">Beschreibung des Datenformats</a> repetiert werden; ich setzte dessen Kenntnis und Verständnis voraus.<br>
+<a name="format"></a>Daher nur kurz: Bekanntlich besteht jedes
+Befehlspaket im Märklin/Motorola-Format aus 9 Einheiten, die aufgrund
+ihrer dreiwertigen Logik im alten Format als "Trits" bezeichnet werden.
+Jedes Trit besteht aus zwei Bit, wobei aber nicht jede Kombination
+"erlaubt" war sondern eben nur drei Kombination: 1 und 1 ("11"), 1 und
+0 ("10") sowie 0 und 0 ("00"). Man sieht sofort, daß hier noch eine
+weitere Kombination vorhanden ist, nämlich 0 und 1 ("01"). Diese
+Kombination ("01")war im alten Format, das auf den
+Datenübertragungs-ICs MC145026 ff von Motorola beruhte, wie ausgeführt
+nicht vorhanden bzw. definiert. Hiervon ist Märklin aber selbst im
+neuen Format bereits abgerückt, den dieses läßt bei den
+Geschwindigkeits-Trits (den Trits D6 bis D9) auch die vierte
+Kombination - "01" - zu und ermöglicht es somit, jede denkbare
+Kombination der Bits zu benutzen. Die hierdurch zusätzlich gewonnenen
+Kombinationen werden im neuen Format u.a. für das absolute
+Richtungskommando und die vier Extrafunktionen verwendet.<br>
+Somit kann man seit Einführung des neuen Formats als kleinste
+Informationseinheit eines Befehls nicht mehr das Trit - bestehend aus
+zwei Bits - sondern jedes einzelne Bit ansehen. Im neuen Format wird
+dies aber nur für die Geschwindigkeitstrits - D5 bis D9 - genutzt, die
+ja nunmehr neben der Geschwindigkeit auch die Richtung und den Status
+der Extrafunktion kommandieren. Nach wie vor nur "dreiwertig" ist
+hingegen die Adresskodierung, woraus sich die Beschränkung auf nur 80
+(81) Adressen trotz 4 x 2 Bit (Trits D1 bis D4) und somit 256 möglichen
+Kombinationen ergibt. Die Auflösung dieser Beschränkung, d.h. die
+Nutzung dieser 4 x 2 Bits als einzelne Bits wie auch bei den
+Geschwindigkeitsdaten führt zu den weiteren 175 (176) Adressen, die
+ohne das Erfordernis eines neuen Datenformats eingestellt und
+kommandiert werden können.
+</font></p><p>
+<font size="4">Gegenwärtig können die IntelliBox, <a href="http://home.arcor.de/dr.koenig/digital/contsoft.htm">LOK</a> und die Linux-Software DDL diese zusätzlichen 175 (176) Adressen kommandieren. Die Uhlenbrock-Dekoder sowie der <a href="http://home.arcor.de/dr.koenig/digital/wiking.htm">Wikinger-Dekoder</a>
+können auch auf diese Adressen eingestellt werden. Da eine
+entsprechende Erweiterung aber sehr einfach ist, wird man davon
+ausgehen können, daß über kurz oder lang alle "besseren" Dekoder auch
+255 (256) Adressen beherrschen.
+</font></p><p>
+<font size="4">Grundsätzlich kann man den "freien" Bitkombinationen
+beliebig Adressen zuordnen. Insbesondere dem Dekoder ist es herzlich
+gleichgültig, welche Adreßnummer der Anwender oder die CU der
+Bitkombination zuordnet, denn er wird ja nur auf die betreffende
+Bitkombination eingestellt.<br>
+Um aber zu gewährleisten, daß die betreffenden Loks mit allen CUs unter
+derselben Adresse angesprochen werden können - was letztlich dem
+Komfort des Anwenders dient und daher auch für "große" Hersteller
+selbstverständlich sein sollte -, empfiehlt es sich, daß man ein
+bereits eingeführtes Schema verwendet. Ich hatte mich dazu
+entschlossen, die bei der IntelliBox verwendete Kodierung zu
+übernehmen, denn die IntelliBox war die erste CU, die dieses Feature
+aufwies - Ehre wem Ehre gebührt. Alle anderen sind diesem Beispiel
+bislang gefolgt. Um die Akzeptanz dieses "Standards" zu erleichtern,
+folgt eine entsprechende Tabelle (der Einfachheit halber als Auszug aus
+dem Quellcode von LOK), aus denen sich alle 256 Adressen ergeben:
+</font></p><p>
+</p><pre><font size="4">Adresse  Dezimal   Hex   Bitfolge  binäre Werte
+adr00   db  085 ;= AA = '10101010';1+4+16+64
+adr01   db  003 ;= C0 = '11000000'=1+2
+adr02   db  001 ;= 80 = '10000000'=1
+adr03   db  012 ;= 30 = '00110000'=4+8
+adr04   db  015 ;= F0 = '11110000'=1+2+4+8
+adr05   db  013 ;= B0 = '10110000'=1+4+8
+adr06   db  004 ;= 20 = '00100000'=4
+adr07   db  007 ;= E0 = '11100000'=1+2+4
+adr08   db  005 ;= A0 = '10100000'=1+4
+adr09   db  048 ;= 0C = '00001100'=16+32
+adr10   db  051 ;= CC = '11001100'=1+2+16+32
+adr11   db  049 ;= 8C = '10001100'=1+16+32
+adr12   db  060 ;= 3C = '00111100'=4+8+16+32
+adr13   db  063 ;= FC = '11111100'=1+2+4+8+16+32
+adr14   db  061 ;= BC = '10111100'=1+4+8+16+32
+adr15   db  052 ;= 2C = '00101100'=4+16+32
+adr16   db  055 ;= EC = '11101100'=1+2+4+16+32
+adr17   db  053 ;= AC = '10101100'=1+4+16+32
+adr18   db  016 ;= 08 = '00001000'=16
+adr19   db  019 ;= C8 = '11001000'=1+2+16
+adr20   db  017 ;= 88 = '10001000'=1+16
+adr21   db  028 ;= 38 = '00111000'=4+8+16
+adr22   db  031 ;= F8 = '11111000'=1+2+4+8+16
+adr23   db  029 ;= B8 = '10111000'=1+4+8+16
+adr24   db  020 ;= 28 = '00101000'=4+16
+adr25   db  023 ;= E8 = '11101000'=1+2+4+16
+adr26   db  021 ;= A8 = '10101000'=1+4+16
+adr27   db  192 ;= 03 = '00000011'=64+128
+adr28   db  195 ;= C3 = '11000011'=1+2+64+128
+adr29   db  193 ;= 83 = '10000011'=1+64+128
+adr30   db  204 ;= 33 = '00110011'=4+8+64+128
+adr31   db  207 ;= F3 = '11110011'=1+2+4+8+64+128
+adr32   db  205 ;= B3 = '10110011'=1+4+8+64+128
+adr33   db  196 ;= 23 = '00100011'=4+64+128
+adr34   db  199 ;= E3 = '11100011'=1+2+4+64+128
+adr35   db  197 ;= A3 = '10100011'=1+4+64+128
+adr36   db  240 ;= 0F = '00001111'=16+32+64+128
+adr37   db  243 ;= CF = '11001111'=1+2+16+32+64+128
+adr38   db  241 ;= 8F = '10001111'=1+16+32+64+128
+adr39   db  252 ;= 3F = '00111111'=4+8+16+32+64+128
+adr40   db  255 ;= FF = '11111111'=1+2+4+8+16+32+64+128
+adr41   db  253 ;= BF = '10111111'=1+4+8+16+32+64+128
+adr42   db  244 ;= 2F = '00101111'=4+16+32+64+128
+adr43   db  247 ;= EF = '11101111'=1+2+4+16+32+64+128
+adr44   db  245 ;= AF = '10101111'=1+4+16+32+64+128
+adr45   db  208 ;= 0B = '00001011'=16+64+128
+adr46   db  211 ;= CB = '11001011'=1+2+16+64+128
+adr47   db  209 ;= 8B = '10001011'=1+16+64+128
+adr48   db  220 ;= 3B = '00111011'=4+8+16+64+128
+adr49   db  223 ;= FB = '11111011'=1+2+4+8+16+64+128
+adr50   db  221 ;= BB = '10111011'=1+4+8+16+64+128
+adr51   db  212 ;= 2B = '00101011'=4+16+64+128
+adr52   db  215 ;= EB = '11101011'=1+2+4+16+64+128
+adr53   db  213 ;= AB = '10101011'=1+4+16+64+128
+adr54   db  064 ;= 02 = '00000010'=64
+adr55   db  067 ;= C2 = '11000010'=1+2+64
+adr56   db  065 ;= 82 = '10000010'=1+64
+adr57   db  076 ;= 32 = '00110010'=4+8+64
+adr58   db  079 ;= F2 = '11110010'=1+2+4+8+64
+adr59   db  077 ;= B2 = '10110010'=1+4+8+64
+adr60   db  068 ;= 22 = '00100010'=4+64
+adr61   db  071 ;= E2 = '11100010'=1+2+4+64
+adr62   db  069 ;= A2 = '10100010'=1+4+64
+adr63   db  112 ;= 0E = '00001110'=16+32+64
+adr64   db  115 ;= CE = '11001110'=1+2+16+32+64
+adr65   db  113 ;= 8E = '10001110'=1+16+32+64
+adr66   db  124 ;= 3E = '00111110'=4+8+16+32+64
+adr67   db  127 ;= FE = '11111110'=1+2+4+8+16+32+64
+adr68   db  125 ;= BE = '10111110'=1+4+8+16+32+64
+adr69   db  116 ;= 2E = '00101110'=4+16+32+64
+adr70   db  119 ;= EE = '11101110'=1+2+4+16+32+64
+adr71   db  117 ;= AE = '10101110'=1+4+16+32+64
+adr72   db  080 ;= 0A = '00001010'=16+64
+adr73   db  083 ;= CA = '11001010'=1+2+16+64
+adr74   db  081 ;= 8A = '10001010'=1+16+64
+adr75   db  092 ;= 3A = '00111010'=4+8+16+64
+adr76   db  095 ;= FA = '11111010'=1+2+4+8+16+64
+adr77   db  093 ;= BA = '10111010'=1+4+8+16+64
+adr78   db  084 ;= 2A = '00101010'=4+16+64
+adr79   db  087 ;= EA = '11101010'=1+2+4+16+64
+adr80   db  000 ;= 00 = '00000000'=0
+adr81   db  002 ;= 40 = '01000000'=2
+adr82   db  006 ;= 60 = '01100000'=2+4
+adr83   db  233 ;= 97 = '10010111'=1+8+32+64+128
+adr84   db  014 ;= 70 = '01110000'=2+4+8
+adr85   db  018 ;= 48 = '01001000'=2+16
+adr86   db  022 ;= 68 = '01101000'=2+4+16
+adr87   db  026 ;= 58 = '01011000'=2+8+16
+adr88   db  030 ;= 78 = '01111000'=2+4+8+16
+adr89   db  034 ;= 44 = '01000100'=2+32
+adr90   db  038 ;= 64 = '01100100'=2+4+32
+adr91   db  042 ;= 54 = '01010100'=2+8+32
+adr92   db  046 ;= 74 = '01110100'=2+4+8+32
+adr93   db  050 ;= 4C = '01001100'=2+16+32
+adr94   db  054 ;= 6C = '01101100'=2+4+16+32
+adr95   db  058 ;= 5C = '01011100'=2+8+16+32
+adr96   db  062 ;= 7C = '01111100'=2+4+8+16+32
+adr97   db  066 ;= 42 = '01000010'=2+64
+adr98   db  070 ;= 62 = '01100010'=2+4+64
+adr99   db  074 ;= 52 = '01010010'=2+8+64
+adr100  db  078 ;= 72 = '01110010'=2+4+8+64
+adr101  db  082 ;= 4A = '01001010'=2+16+64
+adr102  db  086 ;= 6A = '01101010'=2+4+16+64
+adr103  db  090 ;= 5A = '01011010'=2+8+16+64
+adr104  db  094 ;= 7A = '01111010'=2+4+8+16+64
+adr105  db  098 ;= 46 = '01000110'=2+32+64
+adr106  db  102 ;= 66 = '01100110'=2+4+32+64
+adr107  db  106 ;= 56 = '01010110'=2+8+32+64
+adr108  db  110 ;= 76 = '01110110'=2+4+8+32+64
+adr109  db  114 ;= 4E = '01001110'=2+16+32+64
+adr110  db  118 ;= 6E = '01101110'=2+4+16+32+64
+adr111  db  122 ;= 5E = '01011110'=2+8+16+32+64
+adr112  db  126 ;= 7E = '01111110'=2+4+8+16+32+64
+adr113  db  130 ;= 41 = '01000001'=2+128
+adr114  db  134 ;= 61 = '01100001'=2+4+128
+adr115  db  138 ;= 51 = '01010001'=2+8+128
+adr116  db  142 ;= 71 = '01110001'=2+4+8+128
+adr117  db  146 ;= 49 = '01001001'=2+16+128
+adr118  db  150 ;= 69 = '01101001'=2+4+16+128
+adr119  db  154 ;= 59 = '01011001'=2+8+16+128
+adr120  db  158 ;= 79 = '01111001'=2+4+8+16+128
+adr121  db  162 ;= 45 = '01000101'=2+32+128
+adr122  db  166 ;= 65 = '01100101'=2+4+32+128
+adr123  db  249 ;= 9F = '10011111'=1+8+16+32+64+128
+adr124  db  174 ;= 75 = '01110101'=2+4+8+32+128
+adr125  db  178 ;= 4D = '01001101'=2+16+32+128
+adr126  db  182 ;= 6D = '01101101'=2+4+16+32+128
+adr127  db  186 ;= 5D = '01011101'=2+8+16+32+128
+adr128  db  190 ;= 7D = '01111101'=2+4+8+16+32+128
+adr129  db  194 ;= 43 = '01000011'=2+64+128
+adr130  db  198 ;= 63 = '01100011'=2+4+64+128
+adr131  db  202 ;= 53 = '01010011'=2+8+64+128
+adr132  db  206 ;= 73 = '01110011'=2+4+8+64+128
+adr133  db  210 ;= 4B = '01001011'=2+16+64+128
+adr134  db  214 ;= 6B = '01101011'=2+4+16+64+128
+adr135  db  218 ;= 5B = '01011011'=2+8+16+64+128
+adr136  db  222 ;= 7B = '01111011'=2+4+8+16+64+128
+adr137  db  226 ;= 47 = '01000111'=2+32+64+128
+adr138  db  230 ;= 67 = '01100111'=2+4+32+64+128
+adr139  db  234 ;= 57 = '01010111'=2+8+32+64+128
+adr140  db  238 ;= 77 = '01110111'=2+4+8+32+64+128
+adr141  db  242 ;= 4F = '01001111'=2+16+32+64+128
+adr142  db  246 ;= 6F = '01101111'=2+4+16+32+64+128
+adr143  db  250 ;= 5F = '01011111'=2+8+16+32+64+128
+adr144  db  254 ;= 7F = '01111111'=2+4+8+16+32+64+128
+adr145  db  008 ;= 10 = '00010000'=8
+adr146  db  024 ;= 18 = '00011000'=8+16
+adr147  db  040 ;= 14 = '00010100'=8+32
+adr148  db  056 ;= 1C = '00011100'=8+16+32
+adr149  db  072 ;= 12 = '00010010'=8+64
+adr150  db  088 ;= 1A = '00011010'=8+16+64
+adr151  db  104 ;= 16 = '00010110'=8+32+64
+adr152  db  120 ;= 1E = '00011110'=8+16+32+64
+adr153  db  136 ;= 11 = '00010001'=8+128
+adr154  db  152 ;= 19 = '00011001'=8+16+128
+adr155  db  168 ;= 15 = '00010101'=8+32+128
+adr156  db  184 ;= 1D = '00011101'=8+16+32+128
+adr157  db  200 ;= 13 = '00010011'=8+64+128
+adr158  db  216 ;= 1B = '00011011'=8+16+64+128
+adr159  db  232 ;= 17 = '00010111'=8+32+64+128
+adr160  db  248 ;= 1F = '00011111'=8+16+32+64+128
+adr161  db  011 ;= D0 = '11010000'=1+2+8
+adr162  db  027 ;= D8 = '11011000'=1+2+8+16
+adr163  db  043 ;= D4 = '11010100'=1+2+8+32
+adr164  db  059 ;= DC = '11011100'=1+2+8+16+32
+adr165  db  075 ;= D2 = '11010010'=1+2+8+64
+adr166  db  091 ;= DA = '11011010'=1+2+8+16+64
+adr167  db  107 ;= D6 = '11010110'=1+2+8+32+64
+adr168  db  123 ;= DE = '11011110'=1+2+8+16+32+64
+adr169  db  139 ;= D1 = '11010001'=1+2+8+128
+adr170  db  155 ;= D9 = '11011001'=1+2+8+16+128
+adr171  db  171 ;= D5 = '11010101'=1+2+8+32+128
+adr172  db  187 ;= DD = '11011101'=1+2+8+16+32+128
+adr173  db  203 ;= D3 = '11010011'=1+2+8+64+128
+adr174  db  219 ;= DB = '11011011'=1+2+8+16+64+128
+adr175  db  235 ;= D7 = '11010111'=1+2+8+32+64+128
+adr176  db  251 ;= DF = '11011111'=1+2+8+16+32+64+128
+adr177  db  009 ;= 90 = '10010000'=1+8
+adr178  db  025 ;= 98 = '10011000'=1+8+16
+adr179  db  041 ;= 94 = '10010100'=1+8+32
+adr180  db  057 ;= 9C = '10011100'=1+8+16+32
+adr181  db  073 ;= 92 = '10010010'=1+8+64
+adr182  db  089 ;= 9A = '10011010'=1+8+16+64
+adr183  db  105 ;= 96 = '10010110'=1+8+32+64
+adr184  db  121 ;= 9E = '10011110'=1+8+16+32+64
+adr185  db  137 ;= 91 = '10010001'=1+8+128
+adr186  db  153 ;= 99 = '10011001'=1+8+16+128
+adr187  db  169 ;= 95 = '10010101'=1+8+32+128
+adr188  db  185 ;= 9D = '10011101'=1+8+16+32+128
+adr189  db  201 ;= 93 = '10010011'=1+8+64+128
+adr190  db  217 ;= 9B = '10011011'=1+8+16+64+128
+adr191  db  010 ;= 50 = '01010000'=2+8
+adr192  db  170 ;= 55 = '01010101'=2+8+32+128
+adr193  db  032 ;= 04 = '00000100'=32
+adr194  db  096 ;= 06 = '00000110'=32+64
+adr195  db  160 ;= 05 = '00000101'=32+128
+adr196  db  224 ;= 07 = '00000111'=32+64+128
+adr197  db  035 ;= C4 = '11000100'=1+2+32
+adr198  db  099 ;= C6 = '11000110'=1+2+32+64
+adr199  db  163 ;= C5 = '11000101'=1+2+32+128
+adr200  db  227 ;= C7 = '11000111'=1+2+32+64+128
+adr201  db  033 ;= 84 = '10000100'=1+32
+adr202  db  097 ;= 86 = '10000110'=1+32+64
+adr203  db  161 ;= 85 = '10000101'=1+32+128
+adr204  db  225 ;= 87 = '10000111'=1+32+64+128
+adr205  db  044 ;= 34 = '00110100'=4+8+32
+adr206  db  108 ;= 36 = '00110110'=4+8+32+64
+adr207  db  172 ;= 35 = '00110101'=4+8+32+128
+adr208  db  236 ;= 37 = '00110111'=4+8+32+64+128
+adr209  db  047 ;= F4 = '11110100'=1+2+4+8+32
+adr210  db  111 ;= F6 = '11110110'=1+2+4+8+32+64
+adr211  db  175 ;= F5 = '11110101'=1+2+4+8+32+128
+adr212  db  239 ;= F7 = '11110111'=1+2+4+8+32+64+128
+adr213  db  045 ;= B4 = '10110100'=1+4+8+32
+adr214  db  109 ;= B6 = '10110110'=1+4+8+32+64
+adr215  db  173 ;= B5 = '10110101'=1+4+8+32+128
+adr216  db  237 ;= B7 = '10110111'=1+4+8+32+64+128
+adr217  db  036 ;= 24 = '00100100'=4+32
+adr218  db  100 ;= 26 = '00100110'=4+32+64
+adr219  db  164 ;= 25 = '00100101'=4+32+128
+adr220  db  228 ;= 27 = '00100111'=4+32+64+128
+adr221  db  039 ;= E4 = '11100100'=1+2+4+32
+adr222  db  103 ;= E6 = '11100110'=1+2+4+32+64
+adr223  db  167 ;= E5 = '11100101'=1+2+4+32+128
+adr224  db  231 ;= E7 = '11100111'=1+2+4+32+64+128
+adr225  db  037 ;= A4 = '10100100'=1+4+32
+adr226  db  101 ;= A6 = '10100110'=1+4+32+64
+adr227  db  165 ;= A5 = '10100101'=1+4+32+128
+adr228  db  229 ;= A7 = '10100111'=1+4+32+64+128
+adr229  db  128 ;= 01 = '00000001'=128
+adr230  db  131 ;= C1 = '11000001'=1+2+128
+adr231  db  129 ;= 81 = '10000001'=1+128
+adr232  db  140 ;= 31 = '00110001'=4+8+128
+adr233  db  143 ;= F1 = '11110001'=1+2+4+8+128
+adr234  db  141 ;= B1 = '10110001'=1+4+8+128
+adr235  db  132 ;= 21 = '00100001'=4+128
+adr236  db  135 ;= E1 = '11100001'=1+2+4+128
+adr237  db  133 ;= A1 = '10100001'=1+4+128
+adr238  db  176 ;= 0D = '00001101'=16+32+128
+adr239  db  179 ;= CD = '11001101'=1+2+16+32+128
+adr240  db  177 ;= 8D = '10001101'=1+16+32+128
+adr241  db  188 ;= 3D = '00111101'=4+8+16+32+128
+adr242  db  191 ;= FD = '11111101'=1+2+4+8+16+32+128
+adr243  db  189 ;= BD = '10111101'=1+4+8+16+32+128
+adr244  db  180 ;= 2D = '00101101'=4+16+32+128
+adr245  db  183 ;= ED = '11101101'=1+2+4+16+32+128
+adr246  db  181 ;= AD = '10101101'=1+4+16+32+128
+adr247  db  144 ;= 09 = '00001001'=16+128
+adr248  db  147 ;= C9 = '11001001'=1+2+16+128
+adr249  db  145 ;= 89 = '10001001'=1+16+128
+adr250  db  156 ;= 39 = '00111001'=4+8+16+128
+adr251  db  159 ;= F9 = '11111001'=1+2+4+8+16+128
+adr252  db  157 ;= B9 = '10111001'=1+4+8+16+128
+adr253  db  148 ;= 29 = '00101001'=4+16+128
+adr254  db  151 ;= E9 = '11101001'=1+2+4+16+128
+adr255  db  149 ;= A9 = '10101001'=1+4+16+128
+</font></pre>
+<p>
+<font size="4">Die obige Spalte "Hex" enthält die Werte, die diesen Adressen im <a href="http://home.arcor.de/dr.koenig/digital/wiking.htm">Wikinger-Dekoder</a> zugeordnet ist; ich danke <a href="mailto:bbr@emi.dtu.dk">Bo Brændstrup</a>, der mir diese Daten zur Verfügung gestellt hat.
+</font></p><p>
+</p><center><font size="4"><img src="Motorola_Format_Verbesserungen-Dateien/bahn6.gif" border="0"></font></center>
+<p>
+<font size="4"><a name="plus13"></a></font></p><h3><font size="4"><font size="+2">Mehr Fahrtstufen ....</font></font></h3>
+<font size="4">stehen ebenfalls auf dem Wunschzettel des etwas
+erfahreneren Spielers. Im Laufe der Zeit stellt man nämlich fest, daß
+die Beschränkung auf nur 14 Fahrtstufen plus Null (die Fahrtstufe "1"
+bzw. "0001" wird ja zur Fahrtrichtungsumschaltung bei den älteren
+Dekodern benötigt) recht ärgerlich ist. Zum einen ermöglicht sie per se
+keine sonderlich fein abgestufte Einstellung der Geschwindigkeit. Zum
+anderen kommt "erschwerend" hinzu, daß bei Märklin die üblichen
+Reihenschlußmotoren (RSM), auch als Allstrommotor bekannt und
+bezeichnet, keine sonderlich lineare Charakteristik besitzen sondern
+überdies auch noch in entgegengesetzer Weise, wie es wünschenswert
+wäre, nichtlinear sind. D.h. daß bei Ansteuerung mit einer lienaren
+Spannung bzw. einer linearen PWM im unteren Geschwindigkeitsbereich, in
+dem nan sich eine feinere Abstufung wünschen würde, relativ grobe
+Geschwindigkeitstufen autreten, im höheren Geschwindkeitsbereich
+hingegen wesentliche feinere Abstufungen die Regel sind.
+</font><p>
+<font size="4">Diesem Mangel kann man auf drei Arten abhelfen:
+</font></p><p>
+<font size="4">Die erste Möglichkeit besteht darin, daß die CU
+alternierend zwei aufeinanderfolgende Fahrtstufen kommandiert. Hierbei
+wirkt die Lokmasse bzw. Dekoder-Elektronik als Integrator, so daß sich
+optimalerweise eine mittlere und zwischen diesen Fahrtstufen
+befindliche Geschwindigkeit einstellt. Bei <a href="http://home.arcor.de/dr.koenig/digital/contsoft.htm">LOK</a> können auf diese Weise Zwischenfahrtstufen erzeugt werden.<br>
+Leider funktioniert die Integration durch die Lokmasse nicht so schön,
+wie es in der Theorie klingt; in der Praxis ruckeln die meisten Loks
+deutlich. Die Integration durch die Dekoder-Elektronik setzt eine
+Schaltung wie beim 6090- oder 60902-Dekoder voraus, in der eine
+Steuerspannung die Geschwindigkeit bestimmt und ein RC-Glied für das
+die Anfahr- und Bremsverzögerung sorgt: Bei geeigneter Einstellung des
+Potis erfolgt dann tatsächlich eine brauchbare Integration.<br>
+Der weitere Nachteil dieser Verfahrensweise ist, daß die CU
+außerordentlich belastet wird, denn sie muß ja für alle fahrenden Loks
+permanent diese alternierenden Kommandos senden.
+</font></p><p>
+<font size="4">Die zweite Möglichkeit nutzt ein längere Zeit
+"geheimes", d.h. seitens Märklin lange Zeit nicht offiziell
+dokumentiertes Feature der neueren Dekoder. Bei Dekoder-Chips ab der
+Version 701.17 sind nämlich diese Zwischenfahrtstufen zwischen FS2 und
+FS15 bereits implementiert und können durch eine trickreiche
+Ansteuerung genutzt werden. Hierbei wird beim Herunterschalten von
+einer "normalen" Fahrtstufe (wir nennen sie künftig "ganze" FS) auf
+eine niedrigere Fahrtstufe nicht eine Geschwindigkeit eingestellt, die
+der beim Heraufschalten auf die betreffende Fahrtstufe sich ergebende
+Geschwindigkeit entspricht, sondern eine (beim Heraufschalten) zwischen
+dieser und der darauffolgenden "ganzen" FS Geschwindigkeit. <br>
+Wird also von FS10 auf FS9 heruntergeschaltet, so entspricht die
+resultierenden Geschwindigkeit nicht der, die man erhält, wenn man von
+FS0 auf FS9 heraufschaltet, sondern man erhält eine Geschwindigkeit,
+die in der Mitte zwischen den Geschwindigkeiten von FS0-FS9 und
+FS0-FS10 liegt. Beim einfachen Heraufschalten hingegen bleibt es bei
+der Einstellung "ganzer" FS. Will man also "halbe" FS einstellen, so
+muß man zuerst die geschwünschte Fahrtstufe plus "1/2" kommandieren und
+danach die gewünschte Fahrtstufe minus "1/2". Also: Man will FS 8,5
+einstellen. Man sendet daher zuerst FS8,5+"1/2" = FS9 und danach
+FS8,5-"1/2" = FS8.<br>
+<a href="http://home.arcor.de/dr.koenig/digital/contsoft.htm">LOK</a> beherrscht auch diese Verfahrensweise.<br>
+Abgesehen davon, daß dies natürlich nur mit den neueren Dekodern
+möglich ist, hat auch dies den Nachteil, daß die CU wesentlich stäker
+belastet wird; selbst mit der günstigsten Methode müssen noch immer
+deutlich mehr Kommandos gesendet werden und - nach Murphy´s Gesetz
+gerade dann - auftretende Kontaktprobleme vereiteln die korrekte
+Einstellung der Zwischenfahrtstufen.
+</font></p><p>
+<font size="4">Die dritte und wesentlich elegantere Möglichkeit
+erfordert eine sachgerechte Erweiterung des Datenformats. Zu dessen
+Verständnis sollte noch einmal die <a href="http://home.arcor.de/dr.koenig/digital/motoueb.htm">Beschreibung des Datenformats</a> repetiert werden; ich setzte dessen Kenntnis und Verständnis voraus.<br>
+Wie <a href="#format">oben</a>
+erläutert kann man seit Einführung des neuen Formats als kleinste
+Informationseinheit eines Befehls nicht mehr das Trit - bestehend aus
+zwei Bits - sondern jedes einzelne Bit ansehen. Im neuen Format wird
+dies aber nur für die Geschwindigkeitstrits - D5 bis D9 - genutzt, die
+ja nunmehr neben der Geschwindigkeit auch die Richtung und den Status
+der Extrafunktion kommandieren. Die Trits D1 bis D4 für die Adresse
+sowie D5 für die Sonderfunktion sind Märklin-offiziell nach wie vor nur
+als Trits verwendet, wobei für D5 überdies nur zwei Zustände - "0" bzw.
+"00" und "1" bzw. "11" - definiert sind.<br>
+Man sieht ebenfalls sofort, daß beim Sonderfunktionstritt noch zwei
+weitere Kombinationen vorhanden sind, nämlich 1 und 0 ("10") sowie 0
+und 1 ("01"), die nicht anderweitig verwendet werden. Wir stellen nun
+die zusätzlichen 13 Fahrtstufen - sinnvollerweise mit "2+", "3+", "4+"
+... "13+" und "14+" bezeichnet - durch die beiden nicht benutzen
+Zustände des Sonderfunktions-Trits dar, also durch die
+Bit-Kombinationen "10" und "01". Da das Sonderfunktions-Trit auch
+zusammen mit der Adresse sowie der Geschwindigkeit bei jedem
+Befehlspaket und nicht wie die Kommandos zu den vier Extrafunktionen
+nur zyklisch übertragen wird, ist deren Verwendung bei Beibehaltung des
+Datenformats die einzige sinnvolle Lösung, weitere Fahrtstufen
+einstellen zu können; ein "Mißbrauch" einer der Extrafunktionen hätte -
+neben dem Verlust dieser Extrafunktion - den gravierenden Nachteil der
+teilweise ganz erheblichen Zeitverzögerung. <br>
+Fahrtstufen "0+", "1+" und "15+" sind aus Kompatibilitäsgründen nicht
+vorgesehen: Bekanntlich wird der Befehl "01" im alten Format für die
+Fahrtrichtungsumschaltung benutzt. Daher wird ohne dieses Erweiterung
+der Fahrtstufen die Geschwindigkeit der Lok unten durch FS2 begrenzt.
+Die Maximalgeschwindigkeit bestimmt FS15. Die Lok sollte sich aber
+insofern ohne wie auch mit dieser Erweiterung gleich verhalten.
+Demzufolge sind die Befehle "0+, 1, 1+" ebenso wie "15+" für
+Fahrtstufen "verboten".
+<br>Bei dieser Konvention stehen logischerweise das erste Bit des
+Sonderfunktions-Trits für den Status der Sonderfunktion und das zweite
+Bit für den Status der zusätzlichen Zwischenfahrtstufe. Die bereits
+verwendeten Kombinationen "11" sowie "00" bedeuten - wie bisher -
+"Sonderfunktion an / keine Zwischenfahrtstufe" sowie "Sonderfunktion
+aus / keine Zwischenfahrtstufe", die nunmehr neu definierten
+Kombinationen "10" sowie "01" bedeuten demzufolge "Sonderfunktion an /
+Zwischenfahrtstufe ein" sowie "Sonderfunktion aus / Zwischenfahrtstufe
+ein". <br>
+</font></p><p>
+<font size="4">Voraussetzung für die Nutzung dieser zusätzlichen
+Zwischenfahrtstufen sind offensichtlich CUs, die diese entsprechende
+Pulsfolgen erzeugen können, und Dekoder, die diese auswerten.<br>
+<a href="http://home.arcor.de/dr.koenig/digital/contsoft.htm">LOK</a>
+kann Zwischenfahrtstufen selbstverständlich auch auf diese Weise
+kommandieren; auch die Linux-Software DDL besitzt mittlerweile dieses
+Feature. Wir können davon ausgehen, daß auch die IntelliBox über kurz
+oder lang mit diesem Feature aufwarten wird.<br>
+Bei den Dekodern sieht dies leider nicht so gut aus. Gegenwärtig verstehen nur der <a href="http://home.arcor.de/dr.koenig/digital/wiking.htm">Wikinger-Dekoder</a>
+sowie der in allen ROCO-AC-Loks eingebaute ESU-Lokpilot dieses
+erweiterte Format; andere Privatentwickler von Dekodern werden folgen.
+Da dieses Feature aber leicht einzubauen ist, steht zu hoffen, daß auch
+Uhlenbrock diese deutliche Verbesserung ihren Kunden nicht vorenthalten
+wird.
+</font></p><p>
+<font size="4">Programmierer/Entwickler von CUs sollten aber darauf
+achten, dieses Feature dekoderabhängig einstellbar zu machen. Die
+Märklin-Dekoder reagieren nämlich nicht auf Kommandos, bei denen das
+Sonderfunktionstrit den Werte "01" oder "10" hat.
+</font></p><p>
+</p><center><font size="4"><img src="Motorola_Format_Verbesserungen-Dateien/bahn6.gif" border="0"></font></center>
+<p>
+<font size="4"><a name="beleuchtung"></a></font></p><h3><font size="4"><font size="+2">Schaltbare Weichenbeleuchtung</font></font></h3>
+<p>
+<font size="4">Über die Existenzberechtigung von Einbau-Weichendekodern
+kann man geteilter Meinung sein. Aber eines ist klar: Wenn man sie
+benutzt, will man konsequent auf jese zusätzliche Verkabelung
+verzichten und alles über die Digitalspannung versorgen und per Dekoder
+schalten. Was ist dann aber mit der Weichenbeleuchtung?
+</font></p><p>
+<font size="4">Dies ist kein großes Problem. Wir müssen nur eine
+Sub-Adresse je Hauptadresse - nämlich die 8. Subadresse, bei denen die
+Daten "1111" (dezimal also 255) sind - für die Ansteuerung der
+Weichenbeleuchtung abzwacken. Das ist nicht weiter tragisch, denn bei
+Ausnutzen aller Hauptadressen (0 - 80) können ja insgesamt 648
+einpolige Magnetartikel geschaltet werden. Der Verlust von 81
+Sub-Adressen fällt da nicht ins Gewicht. Überdies kann man ja bei
+Beachtung evtl. belegter Adressen für die alten Extra-Funktionen mit
+gesetztem 5. Adressbit weitere 648 einpolige Magnetartikel schalten -
+wenn das Steuergerät dies erlaubt. Da nahezu alle Weichendekoder den
+MC145027 verwenden, genügt hierfür, Adresspin 5 statt auf Masse auf
+Plus zu legen.
+</font></p><p>
+<font size="4">Das Prinzip ist einfach: Im Normalfall sendet das
+Steuergerät nach dem Schalten der Weichen den "Aus"-Befehl, der
+üblicherweise aus dem Datenwert 0 ("0000") besteht. Ist die Beleuchtung
+für Weichen aktiviert, so sendet das Steuergerät stattdessen mit der
+Hauptadresse der eben geschalteten Weiche (0 - 80) den Datenwert
+dezimal 255 ("1111"). Dies hat zur Folge, daß der achte Ausgang, der
+die Weichenlampe schaltet, aktiviert wird. Dies setzt natürlich eine
+Schaltung voraus, bei denen die Selektion der Subadresse durch den 4051
+erfolgt, wie es z.B. beim <a href="http://home.arcor.de/dr.koenig/digital/weichdek.htm">M-Weichendekoder</a> und beim <a href="http://home.arcor.de/dr.koenig/digital/cdeko.htm">C-Weichedekoder</a>
+der Fall ist. Da es dabei um einen 8-zu-1-Selektor handelt, werden alle
+anderen Ausgäge deaktiviert. Dies bedeutet, daß zugleich die eben
+geschaltete Weichenspule von der Spannung getrennt wird - und
+entspricht somit auf diese Spule bezogen dem "Aus"-Befehl. <br>
+Folglich führt jedes Schalten von Weichen dazu, daß der im
+"Ruhezustand" aktivierte 8. Ausgang aller auf dieser Hauptadresse (0 -
+80) eingestellen Dekoder für die Dauer des Schaltens - ca. 0,25 sec. -
+deaktiviert wird. Dies würde sich in einem unschönen Flackern der
+Beleuchtung aller dieser Weichen niederschlagen - läßt sich aber leicht
+dadurch vermeiden, daß für den entsprechenden Schalttransistor ein
+Darlington oder noch besser ein FET verwendet und dessen Steuerspannung
+durch einen kleinen Elko gepuffert wird. Der Elko sorgt dafür, daß für
+einige hundert ms die Beleuchtung aktiviert bleibt. Konkrete
+Ausführungen dieser Schaltung sind in den Schaltplänen des <a href="http://home.arcor.de/dr.koenig/digital/weichdek.htm">M-Weichendekoders</a> und des <a href="http://home.arcor.de/dr.koenig/digital/cdeko.htm">C-Weichedekoders</a> enthalten.
+</font></p><p>
+<font size="4">Ergänzt wird dies durch eine Einstellung des
+Steuergeräts, die bewirkt, daß beim Einschalten der Weichenbeleuchtung
+für die Sub-Adresse 8 aller vorhandenen Weichendekoder der "An-Befehl",
+also der Datenwert 255 ("1111"), gesendet wird; beim Ausschalten der
+Weichenbeleuchtung geschieht dasselbe mit dem Datenwert 0 ("0000").
+Damit kann mit einem Tastendruck die Beleuchtung aller Weichen
+geschaltet werden.
+</font></p><p>
+<font size="4">Vorstehend spreche ich allgemein vom "Steuergerät". Gegenwärtig bietet allerdings lediglich <a href="http://home.arcor.de/dr.koenig/digital/lok.htm">LOK</a>
+diese Möglichkeit. Allerdings dürfte es keine Schwierigkeiten bereiten,
+z.B. den Märklin-Controller über einen PC entsprechend anzusteuern. Wer
+also diese Feature nutzen will, muß <a href="http://home.arcor.de/dr.koenig/digital/lok.htm">LOK</a>
+einsetzen oder aber seinen Hard-/Software-Lieferanten zu einer
+entsprechenden Ergänzung/Änderung veranlassen, sofern er dies durch
+eine entsprechende Makro-Programmierung o.ä. nicht selbst erledigen
+kann.<br>
+</font></p><p>
+</p><center><font size="4"><img src="Motorola_Format_Verbesserungen-Dateien/bahn8.gif" border="0" width="60%"></font></center>
+<p>
+</p><center><font size="4"><a href="http://home.arcor.de/dr.koenig/digital/digital.htm"><i>Homepage</i></a> | <a href="http://home.arcor.de/dr.koenig/digital/everbess.htm"> <img src="Motorola_Format_Verbesserungen-Dateien/uk-flag.gif" alt="Deutsch" align="top" height="20" width="40"></a></font></center>
+<p>
+</p><center><font size="4"><img src="Motorola_Format_Verbesserungen-Dateien/bahn6.gif" border="0"></font></center>
+<p>
+</p><p>
+<font size="4"><font size="3">
+</font></font></p><address>
+</address><center><font size="4"><font size="3">© 1999-2001 by Dr. M. Michael König | Antoniter-Weg 11 | 65843 Sulzbach/Ts. | 
+<a href="http://home.arcor.de/dr.koenig/digital/homepag.htm#kontakt">Kontakt</a> | Stand: 22.7.2001</font></font></center>
+<p>
+
+<font size="4"><font size="3"><font size="2">
+<a href="http://home.arcor.de/dr.koenig/digital/verbess.htm">Revisit this page</a>
+                                                                                                                   </font></font></font></p></body></html>

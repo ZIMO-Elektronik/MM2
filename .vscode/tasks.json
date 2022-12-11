@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "CMake MM2Tests",
+      "type": "shell",
+      "isBackground": true,
+      "command": "cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Debug"
+    },
+    {
+      "label": "Ninja MM2Tests",
+      "type": "shell",
+      "isBackground": true,
+      "command": "ninja -C build MM2Tests"
+    },
+    {
+      "label": "Run MM2Tests",
+      "type": "shell",
+      "isBackground": true,
+      "command": "./build/tests/MM2Tests"
+    }
+  ]
+}
