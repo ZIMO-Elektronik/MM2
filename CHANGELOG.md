@@ -1,5 +1,8 @@
 # Changelog
 
+# 0.8.7
+- Bugfix MM1/2 detection
+
 # 0.8.6
 - time2bit returns Bit enum instead of std::optional (overhead is pretty significant)
 - Bugfix queue not popped in error path

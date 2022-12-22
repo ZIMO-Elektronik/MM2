@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(CMakeModules)
 
 project(
   MM2
-  VERSION 0.8.6
+  VERSION 0.8.7
   LANGUAGES CXX)
 
 set(MM2_RX_QUEUE_SIZE

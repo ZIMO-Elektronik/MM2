@@ -270,12 +270,14 @@ private:
     if (addr == addrs_.primary) impl().function(addr, ztl::make_mask(0u), func);
 
     // MM1 or MM2
-    if (data && data == data >> 1u && !fshift) motorola1();
-    else {
+    if (auto const is_mm2{(data & 0b11'00'00'00u) == 0b01'00'00'00u ||
+                          (data & 0b00'11'00'00u) == 0b00'01'00'00u ||
+                          (data & 0b00'00'11'00u) == 0b00'00'01'00u ||
+                          (data & 0b00'00'00'11u) == 0b00'00'00'01u}) {
       // Follow-up address needs to act like normal one
       uint32_t const addr_to_fwd{queue_.front().addr - (fshift >> 2u)};
       motorola2(addr_to_fwd, fshift);
-    }
+    } else if (!fshift) motorola1();
 
     return true;
   }
