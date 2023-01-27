@@ -123,7 +123,7 @@ struct CrtpBase {
     if (!enabled_) return;
     enabled_ = false;
     reset();
-    mode_ = &CrtpBase::program;
+    mode_ = Mode::Unknown;
   }
 
   /// Encoding of commands bit by bit
@@ -174,16 +174,17 @@ struct CrtpBase {
   /// \return false Command to other address
   bool execute() {
     if (empty(queue_)) return false;
-    bool retval{};
-    // If address was found, store in queue and invoke mode
-    if (auto const addr{decode_address(queue_.front().addr)}) {
-      queue_.front().addr = *addr;
-      retval = std::invoke(mode_, this);
-    }
+    auto const retval{executeThreadMode()};
     queue_.front() = {};
     queue_.pop_front();
     return retval;
   }
+
+  /// Service mode
+  ///
+  /// \return true  Service mode active
+  /// \return false Operations mode active
+  bool serviceMode() const { return mode_ == Mode::Service; }
 
 private:
   constexpr CrtpBase() = default;
@@ -197,47 +198,63 @@ private:
     follow_up_count_ = impl().readCv(10u - 1u) & 0b11u;
   }
 
-  /// Program CV
+  /// Execute in thread mode
+  ///
+  /// \return true  Command to own address
+  /// \return false Command to other address
+  bool executeThreadMode() {
+    // If address was found, store it
+    if (auto const addr{decode_address(queue_.front().addr)})
+      queue_.front().addr = *addr;
+    else return false;
+
+    switch (mode_) {
+      case Mode::Unknown:
+        if (isDirectionChange()) mode_ = Mode::Service;
+        [[fallthrough]];
+      case Mode::Service: return executeService();
+      case Mode::Operations: return executeOperations();
+    }
+  }
+
+  /// Execute commands in service mode
   ///
   /// \return false
-  bool program() {
-    // Check if address is either 0, 80 or primary address
-    auto is_addr{[this] {
-      auto const addr{queue_.front().addr};
-      return addr == 0u || addr == 80u || addr == addrs_.primary;
-    }};
+  bool executeService() {
+    auto const [addr, func, data]{queue_.front()};
 
-    // Check if command is direction change
-    auto is_dir_change{[this] { return queue_.front().data == 0xC0u; }};
+    // Check if address is either 0, 80 or primary address
+    auto is_addr{
+      [&] { return addr == 0u || addr == 80u || addr == addrs_.primary; }};
 
     switch (prog_.state) {
       case Prog::Entry:
-        if (is_addr() && queue_.front().data == 0u) break;
-        else if (is_addr() && is_dir_change()) prog_.state = Prog::Wait0_1;
-        else mode_ = &CrtpBase::motorola;
+        if (is_addr() && data == 0u) break;
+        else if (is_addr() && isDirectionChange()) prog_.state = Prog::Wait0_1;
+        else mode_ = Mode::Operations;
         break;
 
       case Prog::Wait0_1:
-        if (is_addr() && is_dir_change()) break;
-        else if (is_addr() && !is_dir_change()) prog_.state = Prog::Address;
+        if (is_addr() && isDirectionChange()) break;
+        else if (is_addr() && !isDirectionChange()) prog_.state = Prog::Address;
         break;
 
       case Prog::Address:
-        if (is_addr() && !is_dir_change()) break;
-        else if (is_dir_change()) {
-          prog_.addr = queue_.front().addr;
+        if (is_addr() && !isDirectionChange()) break;
+        else if (isDirectionChange()) {
+          prog_.addr = addr;
           prog_.state = Prog::Wait0_2;
         }
         break;
 
       case Prog::Wait0_2:
-        if (is_dir_change()) break;
+        if (isDirectionChange()) break;
         prog_.state = Prog::Value;
         break;
 
       case Prog::Value:
-        if (!is_dir_change()) break;
-        prog_.value = queue_.front().addr;
+        if (!isDirectionChange()) break;
+        prog_.value = addr;
         prog_.state = Prog::Wait0_1;
         impl().writeCv(prog_.addr - 1u, prog_.value);
         break;
@@ -246,11 +263,11 @@ private:
     return false;
   }
 
-  /// Execute a command
+  /// Execute commands in operations mode
   ///
   /// \return true  Command to own address
   /// \return false Command to other address
-  bool motorola() {
+  bool executeOperations() {
     auto const [addr, func, data]{queue_.front()};
     if (!addr) return false;  // Zero is no valid address
 
@@ -395,6 +412,12 @@ private:
     }
   }
 
+  /// Check whether command is direction change
+  ///
+  /// \return true  Command is direction change
+  /// \return false Command is not direction change
+  bool isDirectionChange() const { return queue_.front().data == 0xC0u; }
+
   /// Check if address is a follow-up one. In case it is return a shift which
   /// accounts for 4x function positions so that the first follow-up address
   /// handles F5-F8, the second one F9-F12, ...
@@ -421,12 +444,12 @@ private:
     state_ = State::Address;
   }
 
-  bool (CrtpBase::*mode_)(){&CrtpBase::program};
   size_t bit_count_{};
   ztl::circular_array<Packet, MM2_RX_QUEUE_SIZE> queue_{};  ///< Task queue
   Packet last_valid_own_packet_{};  ///< Copy of last packet for own address
 
   enum class State : uint8_t { Address, Function, Data } state_{};
+  enum class Mode : uint8_t { Unknown, Service, Operations } mode_{};
 
   Addresses addrs_{};
 
