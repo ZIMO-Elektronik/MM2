@@ -5,14 +5,12 @@ set(FETCHCONTENT_QUIET FALSE)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY https://github.com/ZIMO-Elektronik/CMakeModules
-  GIT_TAG v0.0.1
-  GIT_PROGRESS TRUE
-  SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
+  GIT_TAG v0.0.2)
 FetchContent_MakeAvailable(CMakeModules)
 
 project(
   MM2
-  VERSION 0.8.7
+  VERSION 0.8.8
   LANGUAGES CXX)
 
 set(MM2_RX_QUEUE_SIZE

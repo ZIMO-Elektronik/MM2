@@ -1,5 +1,8 @@
 # Changelog
 
+# 0.8.8
+- Add service mode getter
+
 # 0.8.7
 - Bugfix MM1/2 detection
 
