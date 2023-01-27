@@ -128,7 +128,7 @@ struct CrtpBase {
 
   /// Encoding of commands bit by bit
   ///
-  /// \param  time  Last pulse on tracks in us
+  /// \param  time  Time in µs
   void receive(uint32_t time) {
     auto const bit{time2bit(time)};
     if (bit == Invalid) return reset();
