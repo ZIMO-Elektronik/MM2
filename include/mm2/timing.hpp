@@ -23,9 +23,9 @@ enum Timing {
   Bit0Max = Bit0Norm + 6u,   ///< Maximal timing for a 0-bit
 };
 
-/// Convert timing to bit
+/// Convert time to bit
 ///
-/// \param  time  Last pulse on tracks in us
+/// \param  time  Time in µs
 /// \return Bit
 constexpr Bit time2bit(uint32_t time) {
   if (time >= Bit1Min && time <= Bit1Max) return _1;
