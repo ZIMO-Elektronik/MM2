@@ -18,7 +18,7 @@
 #include <ztl/circular_array.hpp>
 #include <ztl/math.hpp>
 #include "../addresses.hpp"
-#include "../timing.hpp"
+#include "../bit.hpp"
 #include "decoder.hpp"
 #include "packet.hpp"
 

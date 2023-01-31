@@ -5,7 +5,8 @@ set(FETCHCONTENT_QUIET FALSE)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY https://github.com/ZIMO-Elektronik/CMakeModules
-  GIT_TAG v0.0.2)
+  GIT_TAG v0.0.2
+  SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
 project(
@@ -38,7 +39,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
 endif()
 
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+if(BUILD_TESTING
+   AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME
+   AND CMAKE_SYSTEM_NAME STREQUAL CMAKE_HOST_SYSTEM_NAME)
   add_subdirectory(examples)
   add_subdirectory(tests)
 endif()

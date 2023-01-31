@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "bit.hpp"
+#include <cstdint>
 
 namespace mm2 {
 
@@ -22,15 +22,5 @@ enum Timing {
   Bit0Min = Bit0Norm - 6u,   ///< Minimal timing for a 0-bit
   Bit0Max = Bit0Norm + 6u,   ///< Maximal timing for a 0-bit
 };
-
-/// Convert time to bit
-///
-/// \param  time  Time in µs
-/// \return Bit
-constexpr Bit time2bit(uint32_t time) {
-  if (time >= Bit1Min && time <= Bit1Max) return _1;
-  else if (time >= Bit0Min && time <= Bit0Max) return _0;
-  else return Invalid;
-}
 
 }  // namespace mm2

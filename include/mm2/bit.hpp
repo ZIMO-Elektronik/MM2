@@ -10,10 +10,20 @@
 
 #pragma once
 
-#include <cstdint>
+#include "timing.hpp"
 
 namespace mm2 {
 
 enum Bit : uint8_t { _0, _1, Invalid };
+
+/// Convert time to bit
+///
+/// \param  time  Time in µs
+/// \return Bit
+constexpr Bit time2bit(uint32_t time) {
+  if (time >= Bit1Min && time <= Bit1Max) return _1;
+  else if (time >= Bit0Min && time <= Bit0Max) return _0;
+  else return Invalid;
+}
 
 }  // namespace mm2
