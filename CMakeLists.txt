@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 include(FetchContent)
 
-set(FETCHCONTENT_QUIET FALSE)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY https://github.com/ZIMO-Elektronik/CMakeModules
-  GIT_TAG v0.0.2
+  GIT_TAG v0.0.5
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
