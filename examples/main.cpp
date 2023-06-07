@@ -1,7 +1,5 @@
 #include <mm2/mm2.hpp>
 
-#define TIMER_VALUE 42u
-
 struct Mm2 : mm2::rx::CrtpBase<Mm2> {
   friend mm2::rx::CrtpBase<Mm2>;
 
@@ -21,13 +19,13 @@ private:
   void function(uint32_t addr, uint32_t mask, uint32_t state) {}
 
   // Read CV
-  uint8_t readCv(uint32_t addr) {}
+  uint8_t readCv(uint32_t cv_addr) {}
 
   // Write CV
-  uint8_t writeCv(uint32_t addr, uint8_t value) {}
+  uint8_t writeCv(uint32_t cv_addr, uint8_t value) {}
 
   // Timer interrupt calls receive with captured value
-  void interrupt() { receive(TIMER_VALUE); }
+  void interrupt() { receive(/* captured timer value */); }
 };
 
 int main() { Mm2 mm2{}; }
