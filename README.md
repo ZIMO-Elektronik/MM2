@@ -1,6 +1,6 @@
 # MM2
 
-[![build](https://github.com/ZIMO-Elektronik/MM2/actions/workflows/build.yml/badge.svg)](https://github.com/ZIMO-Elektronik/MDU/actions/workflows/build.yml)
+[![build](https://github.com/ZIMO-Elektronik/MM2/actions/workflows/build.yml/badge.svg)](https://github.com/ZIMO-Elektronik/MM2/actions/workflows/build.yml)
 
 <img src="data/images/logo.png" width="10%" align="right">
 
