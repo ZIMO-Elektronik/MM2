@@ -41,6 +41,9 @@ private:
   uint8_t writeCv(uint32_t cv_addr, uint8_t value) {}
 
   // Timer interrupt calls receive with captured value
-  void interrupt() { receive(/* captured timer value */); }
+  void interrupt() {
+    uint32_t const timer_value{/* captured timer value */};
+    receive(timer_value);
+  }
 };
 ```
