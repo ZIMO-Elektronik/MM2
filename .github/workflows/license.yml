@@ -1,0 +1,13 @@
+name: license
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  check-license:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check license
+        uses: kt3k/license_checker@v1.0.6
