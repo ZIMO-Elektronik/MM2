@@ -4,13 +4,14 @@ include(FetchContent)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY https://github.com/ZIMO-Elektronik/CMakeModules
-  GIT_TAG v0.0.5
+  GIT_TAG v0.0.7
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
+version_from_git()
 project(
   MM2
-  VERSION 0.8.8
+  VERSION ${VERSION_FROM_GIT}
   LANGUAGES CXX)
 
 set(MM2_RX_QUEUE_SIZE
