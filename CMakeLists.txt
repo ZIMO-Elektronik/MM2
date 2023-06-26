@@ -31,7 +31,9 @@ else()
   target_include_directories(MM2 SYSTEM INTERFACE include)
 endif()
 
-cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.16.2")
+if(NOT TARGET ZTL::ZTL)
+  cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.16.2")
+endif()
 
 target_link_libraries(MM2 INTERFACE ZTL::ZTL)
 
