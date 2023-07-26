@@ -15,7 +15,7 @@
 #include <cstdint>
 #include <optional>
 #include <ztl/bits.hpp>
-#include <ztl/circular_array.hpp>
+#include <ztl/inplace_deque.hpp>
 #include <ztl/math.hpp>
 #include "../addresses.hpp"
 #include "../bit.hpp"
@@ -114,16 +114,16 @@ struct CrtpBase {
 
   /// Enable
   void enable() {
-    if (enabled_) return;
-    enabled_ = true;
+    if (_enabled) return;
+    _enabled = true;
   }
 
   /// Disable
   void disable() {
-    if (!enabled_) return;
-    enabled_ = false;
+    if (!_enabled) return;
+    _enabled = false;
     reset();
-    mode_ = Mode::Unknown;
+    _mode = Mode::Unknown;
   }
 
   /// Encoding of commands bit by bit
@@ -134,35 +134,35 @@ struct CrtpBase {
     if (bit == Invalid) return reset();
 
     // Alternate halfbit <-> bit
-    is_halfbit_ = !is_halfbit_;
-    if (!is_halfbit_) return;
+    _is_halfbit = !_is_halfbit;
+    if (!_is_halfbit) return;
 
     // If queue is full return
-    if (queue_.full()) return;
+    if (full(_deque)) return;
 
     // Successfully received a bit -> enter state machine
-    switch (state_) {
+    switch (_state) {
       case State::Address: {
-        auto& addr{end(queue_)->addr};
+        auto& addr{end(_deque)->addr};
         addr = static_cast<uint8_t>((addr << 1u) | bit);
-        if (++bit_count_ < 8uz) return;
-        state_ = State::Function;
-        bit_count_ = 0uz;
+        if (++_bit_count < 8uz) return;
+        _state = State::Function;
+        _bit_count = 0uz;
         break;
       }
       case State::Function:
-        if (!bit_count_) end(queue_)->func = bit;
-        if (++bit_count_ < 2uz) return;
-        state_ = State::Data;
-        bit_count_ = 0uz;
+        if (!_bit_count) end(_deque)->func = bit;
+        if (++_bit_count < 2uz) return;
+        _state = State::Data;
+        _bit_count = 0uz;
         break;
       case State::Data: {
-        auto& data{end(queue_)->data};
+        auto& data{end(_deque)->data};
         data = static_cast<uint8_t>((data << 1u) | bit);
-        if (++bit_count_ < 8uz) return;
-        state_ = State::Address;
-        bit_count_ = 0uz;
-        queue_.push_back();  // Successfully red a packet
+        if (++_bit_count < 8uz) return;
+        _state = State::Address;
+        _bit_count = 0uz;
+        _deque.push_back();  // Successfully red a packet
         break;
       }
     }
@@ -173,10 +173,10 @@ struct CrtpBase {
   /// \return true  Command to own address
   /// \return false Command to other address
   bool execute() {
-    if (empty(queue_)) return false;
+    if (empty(_deque)) return false;
     auto const retval{executeThreadMode()};
-    queue_.front() = {};
-    queue_.pop_front();
+    _deque.front() = {};
+    _deque.pop_front();
     return retval;
   }
 
@@ -184,7 +184,7 @@ struct CrtpBase {
   ///
   /// \return true  Service mode active
   /// \return false Operations mode active
-  bool serviceMode() const { return mode_ == Mode::Service; }
+  bool serviceMode() const { return _mode == Mode::Service; }
 
 private:
   constexpr CrtpBase() = default;
@@ -193,9 +193,9 @@ private:
 
   /// Configure
   void config() {
-    addrs_ = {.primary = impl().readCv(1u - 1u),
+    _addrs = {.primary = impl().readCv(1u - 1u),
               .consist = impl().readCv(19u - 1u) & 0b0111'1111u};
-    follow_up_count_ = impl().readCv(10u - 1u) & 0b11u;
+    _follow_up_count = impl().readCv(10u - 1u) & 0b11u;
   }
 
   /// Execute in thread mode
@@ -204,13 +204,13 @@ private:
   /// \return false Command to other address
   bool executeThreadMode() {
     // If address was found, store it
-    if (auto const addr{decode_address(queue_.front().addr)})
-      queue_.front().addr = *addr;
+    if (auto const addr{decode_address(_deque.front().addr)})
+      _deque.front().addr = *addr;
     else return false;
 
-    switch (mode_) {
+    switch (_mode) {
       case Mode::Unknown:
-        if (isDirectionChange()) mode_ = Mode::Service;
+        if (isDirectionChange()) _mode = Mode::Service;
         [[fallthrough]];
       case Mode::Service: return executeService();
       case Mode::Operations: return executeOperations();
@@ -221,42 +221,42 @@ private:
   ///
   /// \return false
   bool executeService() {
-    auto const [addr, func, data]{queue_.front()};
+    auto const [addr, func, data]{_deque.front()};
 
     // Check if address is either 0, 80 or primary address
     auto is_addr{
-      [&] { return addr == 0u || addr == 80u || addr == addrs_.primary; }};
+      [&] { return addr == 0u || addr == 80u || addr == _addrs.primary; }};
 
-    switch (prog_.state) {
+    switch (_prog.state) {
       case Prog::Entry:
         if (is_addr() && data == 0u) break;
-        else if (is_addr() && isDirectionChange()) prog_.state = Prog::Wait0_1;
-        else mode_ = Mode::Operations;
+        else if (is_addr() && isDirectionChange()) _prog.state = Prog::Wait0_1;
+        else _mode = Mode::Operations;
         break;
 
       case Prog::Wait0_1:
         if (is_addr() && isDirectionChange()) break;
-        else if (is_addr() && !isDirectionChange()) prog_.state = Prog::Address;
+        else if (is_addr() && !isDirectionChange()) _prog.state = Prog::Address;
         break;
 
       case Prog::Address:
         if (is_addr() && !isDirectionChange()) break;
         else if (isDirectionChange()) {
-          prog_.addr = addr;
-          prog_.state = Prog::Wait0_2;
+          _prog.addr = addr;
+          _prog.state = Prog::Wait0_2;
         }
         break;
 
       case Prog::Wait0_2:
         if (isDirectionChange()) break;
-        prog_.state = Prog::Value;
+        _prog.state = Prog::Value;
         break;
 
       case Prog::Value:
         if (!isDirectionChange()) break;
-        prog_.value = addr;
-        prog_.state = Prog::Wait0_1;
-        impl().writeCv(prog_.addr - 1u, prog_.value);
+        _prog.value = addr;
+        _prog.state = Prog::Wait0_1;
+        impl().writeCv(_prog.addr - 1u, _prog.value);
         break;
     }
 
@@ -268,23 +268,23 @@ private:
   /// \return true  Command to own address
   /// \return false Command to other address
   bool executeOperations() {
-    auto const [addr, func, data]{queue_.front()};
+    auto const [addr, func, data]{_deque.front()};
     if (!addr) return false;  // Zero is no valid address
 
     auto const fshift{fShift()};
 
     // Address check
-    if (addr != addrs_.primary && addr != addrs_.consist && !fshift)
+    if (addr != _addrs.primary && addr != _addrs.consist && !fshift)
       return false;
 
     // Valid packets must be received twice
-    if (last_valid_own_packet_ != queue_.front()) {
-      last_valid_own_packet_ = queue_.front();
+    if (_last_valid_own_packet != _deque.front()) {
+      _last_valid_own_packet = _deque.front();
       return true;
     }
 
     // Function
-    if (addr == addrs_.primary) impl().function(addr, ztl::make_mask(0u), func);
+    if (addr == _addrs.primary) impl().function(addr, ztl::make_mask(0u), func);
 
     // MM1 or MM2
     if (auto const is_mm2{(data & 0b11'00'00'00u) == 0b01'00'00'00u ||
@@ -292,7 +292,7 @@ private:
                           (data & 0b00'00'11'00u) == 0b00'00'01'00u ||
                           (data & 0b00'00'00'11u) == 0b00'00'00'01u}) {
       // Follow-up address needs to act like normal one
-      uint32_t const addr_to_fwd{queue_.front().addr - (fshift >> 2u)};
+      uint32_t const addr_to_fwd{_deque.front().addr - (fshift >> 2u)};
       motorola2(addr_to_fwd, fshift);
     } else if (!fshift) motorola1();
 
@@ -301,14 +301,14 @@ private:
 
   /// Execute MM1 command
   void motorola1() {
-    auto const addr{queue_.front().addr}, data{queue_.front().data};
+    auto const addr{_deque.front().addr}, data{_deque.front().data};
     if (auto const n{decode_notch(data)}) {
-      last_cmd_was_dir_change_ = false;
+      _last_cmd_was_dir_change = false;
       impl().notch(addr, *n);
     }
     // Direction
-    else if (!last_cmd_was_dir_change_) {
-      last_cmd_was_dir_change_ = true;
+    else if (!_last_cmd_was_dir_change) {
+      _last_cmd_was_dir_change = true;
       impl().reverse(addr);
     }
   }
@@ -319,7 +319,7 @@ private:
   /// \param  fshift  0   Packet contains base address
   ///                 >0  Packet contains follow-up address
   void motorola2(uint32_t addr, uint32_t fshift) {
-    auto const data{queue_.front().data};
+    auto const data{_deque.front().data};
 
     // Command is either exception
     if (auto const exc{decode_exception(data)})
@@ -375,7 +375,7 @@ private:
   /// \param  dir     Direction
   void motorola2Direction(uint32_t addr, uint32_t fshift, int32_t dir) {
     if (fshift) return;
-    auto const reverse{addr == addrs_.primary
+    auto const reverse{addr == _addrs.primary
                          ? impl().readCv(29u - 1u) & ztl::make_mask(0u)
                          : impl().readCv(19u - 1u) & ztl::make_mask(7u)};
     impl().direction(addr, reverse ? dir * -1 : dir);
@@ -416,7 +416,7 @@ private:
   ///
   /// \return true  Command is direction change
   /// \return false Command is not direction change
-  bool isDirectionChange() const { return queue_.front().data == 0xC0u; }
+  bool isDirectionChange() const { return _deque.front().data == 0xC0u; }
 
   /// Check if address is a follow-up one. In case it is return a shift which
   /// accounts for 4x function positions so that the first follow-up address
@@ -424,47 +424,47 @@ private:
   ///
   /// \return F-shift
   uint32_t fShift() const {
-    auto const addr{queue_.front().addr};
+    auto const addr{_deque.front().addr};
     // Zero is no valid address
     if (!addr) return 0u;
     // Check if address is one of three chaining addresses
-    for (auto i{follow_up_count_}; i; --i)
-      if (addr == addrs_.primary + i) return i << 2u;
+    for (auto i{_follow_up_count}; i; --i)
+      if (addr == _addrs.primary + i) return i << 2u;
     return 0u;
   }
 
   /// Flush the current packet
-  void flush() { *end(queue_) = {}; }
+  void flush() { *end(_deque) = {}; }
 
   /// Reset
   void reset() {
     flush();
-    bit_count_ = 0uz;
-    is_halfbit_ = false;
-    state_ = State::Address;
+    _bit_count = 0uz;
+    _is_halfbit = false;
+    _state = State::Address;
   }
 
-  size_t bit_count_{};
-  ztl::circular_array<Packet, MM2_RX_QUEUE_SIZE> queue_{};  ///< Task queue
-  Packet last_valid_own_packet_{};  ///< Copy of last packet for own address
+  size_t _bit_count{};
+  ztl::inplace_deque<Packet, MM2_RX_DEQUE_SIZE> _deque{};  ///< Task queue
+  Packet _last_valid_own_packet{};  ///< Copy of last packet for own address
 
-  enum class State : uint8_t { Address, Function, Data } state_{};
-  enum class Mode : uint8_t { Unknown, Service, Operations } mode_{};
+  enum class State : uint8_t { Address, Function, Data } _state{};
+  enum class Mode : uint8_t { Unknown, Service, Operations } _mode{};
 
-  Addresses addrs_{};
+  Addresses _addrs{};
 
   struct Prog {
     enum : uint8_t { Entry, Wait0_1, Address, Wait0_2, Value } state;
     uint8_t addr;
     uint8_t value;
-  } prog_{};
+  } _prog{};
 
   // Not bitfields as those are most likely mutated in interrupt context
-  bool is_halfbit_{};
+  bool _is_halfbit{};
 
-  uint8_t follow_up_count_ : 2 {};  // Limit to 3x follow-up addresses
-  bool enabled_ : 1 {};
-  bool last_cmd_was_dir_change_ : 1 {};
+  uint8_t _follow_up_count : 2 {};  // Limit to 3x follow-up addresses
+  bool _enabled : 1 {};
+  bool _last_cmd_was_dir_change : 1 {};
 };
 
 }  // namespace rx

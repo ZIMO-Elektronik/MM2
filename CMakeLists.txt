@@ -4,7 +4,7 @@ include(FetchContent)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY https://github.com/ZIMO-Elektronik/CMakeModules
-  GIT_TAG v0.0.7
+  GIT_TAG v0.1.2
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
@@ -14,16 +14,16 @@ project(
   VERSION ${VERSION_FROM_GIT}
   LANGUAGES CXX)
 
-set(MM2_RX_QUEUE_SIZE
+set(MM2_RX_DEQUE_SIZE
     8uz-1uz
-    CACHE STRING "Size of the receiver queue of mm2::rx::CrtpBase")
+    CACHE STRING "Size of the receiver deque of mm2::rx::CrtpBase")
 
 add_library(MM2 INTERFACE)
 add_library(MM2::MM2 ALIAS MM2)
 
 target_compile_features(MM2 INTERFACE cxx_std_23)
 
-target_compile_definitions(MM2 INTERFACE MM2_RX_QUEUE_SIZE=${MM2_RX_QUEUE_SIZE})
+target_compile_definitions(MM2 INTERFACE MM2_RX_DEQUE_SIZE=${MM2_RX_DEQUE_SIZE})
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   target_include_directories(MM2 INTERFACE include)
@@ -31,8 +31,10 @@ else()
   target_include_directories(MM2 SYSTEM INTERFACE include)
 endif()
 
+target_common_warnings(MM2 INTERFACE)
+
 if(NOT TARGET ZTL::ZTL)
-  cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.16.2")
+  cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.17.0")
 endif()
 
 target_link_libraries(MM2 INTERFACE ZTL::ZTL)

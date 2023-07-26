@@ -19,10 +19,10 @@ private:
   void function(uint32_t addr, uint32_t mask, uint32_t state) {}
 
   // Read CV
-  uint8_t readCv(uint32_t cv_addr) {}
+  uint8_t readCv(uint32_t cv_addr) { return {}; }
 
   // Write CV
-  uint8_t writeCv(uint32_t cv_addr, uint8_t value) {}
+  uint8_t writeCv(uint32_t cv_addr, uint8_t value) { return {}; }
 
   // Timer interrupt calls receive with captured value
   void interrupt() {

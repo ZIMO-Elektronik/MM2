@@ -5,7 +5,7 @@ add_executable(MM2Tests ${SRC})
 
 sanatize("address,undefined")
 
-target_common_warnings(MM2Tests)
+target_common_warnings(MM2Tests PRIVATE)
 
 cpmaddpackage("gh:google/googletest#main")
 
