@@ -67,12 +67,12 @@ constexpr std::optional<int32_t> decode_direction(uint8_t data) {
   return {};
 }
 
-/// Decode notch
+/// Decode speed
 ///
 /// \param  data    Data to decode
-/// \return int32_t Notch
-/// \return {}      No notch
-constexpr std::optional<int32_t> decode_notch(uint8_t data) {
+/// \return int32_t Speed
+/// \return {}      No speed
+constexpr std::optional<int32_t> decode_speed(uint8_t data) {
   uint32_t const value{
     (data & ztl::make_mask(7u)) >> 7u | (data & ztl::make_mask(5u)) >> 4u |
     (data & ztl::make_mask(3u)) >> 1u | (data & ztl::make_mask(1u)) << 2u};
@@ -302,9 +302,9 @@ private:
   /// Execute MM1 command
   void motorola1() {
     auto const addr{_deque.front().addr}, data{_deque.front().data};
-    if (auto const n{decode_notch(data)}) {
+    if (auto const speed{decode_speed(data)}) {
       _last_cmd_was_dir_change = false;
-      impl().notch(addr, *n);
+      impl().speed(addr, *speed);
     }
     // Direction
     else if (!_last_cmd_was_dir_change) {
@@ -332,8 +332,9 @@ private:
       else motorola2Function(addr, fshift, data);
     }
 
-    // Notch, ignore direction changes
-    if (auto const n{decode_notch(data)}; n && !fshift) impl().notch(addr, *n);
+    // Speed, ignore direction changes
+    if (auto const speed{decode_speed(data)}; speed && !fshift)
+      impl().speed(addr, *speed);
   }
 
   /// Execute MM2 exception

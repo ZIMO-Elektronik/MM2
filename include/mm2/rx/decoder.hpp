@@ -20,11 +20,11 @@ concept Decoder = Readable<T> && Writable<T> &&
                   requires(T t,
                            uint32_t addr,
                            int32_t dir,
-                           int32_t notch,
+                           int32_t speed,
                            uint32_t mask,
                            uint32_t state) {
                     { t.direction(addr, dir) } -> std::same_as<void>;
-                    { t.notch(addr, notch) } -> std::same_as<void>;
+                    { t.speed(addr, speed) } -> std::same_as<void>;
                     { t.reverse(addr) } -> std::same_as<void>;
                     { t.function(addr, mask, state) } -> std::same_as<void>;
                   };

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.0
+- Use 'speed' instead of 'notch'
+- Update to ZTL 0.18.0
+
 ## 0.8.9
 - Update to ZTL 0.17.0
 

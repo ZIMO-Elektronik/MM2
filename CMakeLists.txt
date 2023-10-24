@@ -4,7 +4,7 @@ include(FetchContent)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY https://github.com/ZIMO-Elektronik/CMakeModules
-  GIT_TAG v0.1.2
+  GIT_TAG v0.2.1
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
@@ -34,7 +34,7 @@ endif()
 target_common_warnings(MM2 INTERFACE)
 
 if(NOT TARGET ZTL::ZTL)
-  cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.17.0")
+  cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.18.0")
 endif()
 
 target_link_libraries(MM2 INTERFACE ZTL::ZTL)

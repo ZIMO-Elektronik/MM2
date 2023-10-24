@@ -25,8 +25,8 @@ private:
   // Set directon
   void direction(uint32_t addr, int32_t dir) {}
 
-  // Set notch
-  void notch(uint32_t addr, int32_t notch) {}
+  // Set speed
+  void speed(uint32_t addr, int32_t speed) {}
 
   // Reverse direction
   void reverse(uint32_t addr) {}
