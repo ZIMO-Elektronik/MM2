@@ -17,7 +17,7 @@ namespace mm2::rx {
 
 template<typename T>
 concept Readable = requires(T t, uint32_t cv_addr) {
-                     { t.readCv(cv_addr) } -> std::convertible_to<uint8_t>;
-                   };
+  { t.readCv(cv_addr) } -> std::convertible_to<uint8_t>;
+};
 
 }  // namespace mm2::rx
