@@ -15,12 +15,12 @@
 namespace mm2 {
 
 enum Timing {
-  Bit1Norm = 182u,           ///< Norm timing for a 1-bit
-  Bit1Min = Bit1Norm - 20u,  ///< Minimal timing for a 1-bit
-  Bit1Max = Bit1Norm + 20u,  ///< Maximal timing for a 1-bit
-  Bit0Norm = 26u,            ///< Norm timing for a 0-bit
-  Bit0Min = Bit0Norm - 6u,   ///< Minimal timing for a 0-bit
-  Bit0Max = Bit0Norm + 6u,   ///< Maximal timing for a 0-bit
+  Bit1 = 182u,           ///< Standard timing for a 1-bit
+  Bit1Min = Bit1 - 20u,  ///< Minimal timing for a 1-bit
+  Bit1Max = Bit1 + 20u,  ///< Maximal timing for a 1-bit
+  Bit0 = 26u,            ///< Standard timing for a 0-bit
+  Bit0Min = Bit0 - 6u,   ///< Minimal timing for a 0-bit
+  Bit0Max = Bit0 + 6u,   ///< Maximal timing for a 0-bit
 };
 
 }  // namespace mm2
