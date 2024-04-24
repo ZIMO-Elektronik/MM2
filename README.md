@@ -22,7 +22,7 @@ struct Mm2 : mm2::rx::CrtpBase<Mm2> {
   constexpr Mm2() = default;
 
 private:
-  // Set directon
+  // Set direction
   void direction(uint32_t addr, int32_t dir) {}
 
   // Set speed

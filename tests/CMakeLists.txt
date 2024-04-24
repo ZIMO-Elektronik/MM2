@@ -3,7 +3,7 @@ include(GoogleTest)
 file(GLOB_RECURSE SRC *.cpp)
 add_executable(MM2Tests ${SRC})
 
-sanitize("address,undefined")
+sanitize(address,undefined)
 
 target_common_warnings(MM2Tests PRIVATE)
 
