@@ -1,8 +1,3 @@
-file(GLOB_RECURSE SRC *.cpp)
-add_executable(MM2Examples ${SRC})
-
-sanitize(address,undefined)
-
-target_common_warnings(MM2Examples PRIVATE)
-
-target_link_libraries(MM2Examples PRIVATE MM2::MM2)
+if(CMAKE_SYSTEM_NAME STREQUAL CMAKE_HOST_SYSTEM_NAME)
+  add_subdirectory(decoder)
+endif()

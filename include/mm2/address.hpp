@@ -48,13 +48,13 @@ inline constexpr std::array<Address, 256uz> address_table{
 
 /// Decode address
 ///
-/// \param  data    Data to decode
-/// \return Address Address found
-/// \return {}      No address found
+/// \param  data          Data to decode
+/// \retval Address       Address found
+/// \retval std::nullopt  No address found
 constexpr std::optional<Address> decode_address(uint8_t data) {
   for (auto i{0uz}; i < size(detail::address_table); ++i)
     if (data == detail::address_table[i]) return i;
-  return {};
+  return std::nullopt;
 }
 
 /// Encode address

@@ -19,13 +19,11 @@ Here is an example for how a class which implements it might look. The friend de
 struct Mm2 : mm2::rx::CrtpBase<Mm2> {
   friend mm2::rx::CrtpBase<Mm2>;
 
-  constexpr Mm2() = default;
-
 private:
-  // Set direction
-  void direction(uint32_t addr, int32_t dir) {}
+  // Set direction (1 forward, 0 backward)
+  void direction(uint32_t addr, bool dir) {}
 
-  // Set speed
+  // Set speed [0, 255] (regardless of CV settings)
   void speed(uint32_t addr, int32_t speed) {}
 
   // Reverse direction

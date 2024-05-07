@@ -19,6 +19,7 @@
 #include <ztl/math.hpp>
 #include "../addresses.hpp"
 #include "../bit.hpp"
+#include "../direction.hpp"
 #include "decoder.hpp"
 #include "packet.hpp"
 
@@ -57,35 +58,36 @@ constexpr uint32_t aebfcgdh_mask(uint32_t dcba, uint32_t efgh) {
 
 /// Decode direction
 ///
-/// \param  data    Data to decode
-/// \return int32_t Direction
-/// \return {}      No direction
-constexpr std::optional<int32_t> decode_direction(uint8_t data) {
+/// \param  data          Data to decode
+/// \retval 1             Forward
+/// \retval 0             Backward
+/// \retval std::nullopt  No direction
+constexpr std::optional<bool> decode_direction(uint8_t data) {
   data = static_cast<uint8_t>(data & efgh_mask(0b1110u));
-  if (data == efgh_mask(0b1010u)) return -1;
-  if (data == efgh_mask(0b0100u)) return 1;
-  return {};
+  if (data == efgh_mask(0b1010u)) return Backward;
+  if (data == efgh_mask(0b0100u)) return Forward;
+  return std::nullopt;
 }
 
 /// Decode speed
 ///
-/// \param  data    Data to decode
-/// \return int32_t Speed
-/// \return {}      No speed
+/// \param  data          Data to decode
+/// \retval int32_t       Speed
+/// \retval std::nullopt  No speed
 constexpr std::optional<int32_t> decode_speed(uint8_t data) {
   uint32_t const value{
     (data & ztl::make_mask(7u)) >> 7u | (data & ztl::make_mask(5u)) >> 4u |
     (data & ztl::make_mask(3u)) >> 1u | (data & ztl::make_mask(1u)) << 2u};
   if (value == 0u) return 0;
-  if (value == 1u) return {};
+  if (value == 1u) return std::nullopt;
   return ztl::lerp<int32_t>(static_cast<int32_t>(value) - 1, 0, 14, 0, 255);
 }
 
 /// Decode exceptions
 ///
-/// \param  data      Data to decode
-/// \return uint32_t  Exception
-/// \return {}        No exception
+/// \param  data          Data to decode
+/// \retval uint32_t      Exception
+/// \retval std::nullopt  No exception
 constexpr std::optional<uint32_t> decode_exception(uint8_t data) {
   switch (data) {
     case aebfcgdh_mask(0b0011u, 0b1010u): return 2u;
@@ -97,7 +99,7 @@ constexpr std::optional<uint32_t> decode_exception(uint8_t data) {
     case aebfcgdh_mask(0b1110u, 0b0101u): return 13u;
     case aebfcgdh_mask(0b1111u, 0b0101u): return 14u;
   }
-  return {};
+  return std::nullopt;
 }
 
 namespace rx {
@@ -170,8 +172,8 @@ struct CrtpBase {
 
   /// Execute received commands
   ///
-  /// \return true  Command to own address
-  /// \return false Command to other address
+  /// \retval true  Command to own address
+  /// \retval false Command to other address
   bool execute() {
     if (empty(_deque)) return false;
     auto const retval{executeThreadMode()};
@@ -182,8 +184,8 @@ struct CrtpBase {
 
   /// Service mode
   ///
-  /// \return true  Service mode active
-  /// \return false Operations mode active
+  /// \retval true  Service mode active
+  /// \retval false Operations mode active
   bool serviceMode() const { return _mode == Mode::Service; }
 
 private:
@@ -200,8 +202,8 @@ private:
 
   /// Execute in thread mode
   ///
-  /// \return true  Command to own address
-  /// \return false Command to other address
+  /// \retval true  Command to own address
+  /// \retval false Command to other address
   bool executeThreadMode() {
     // If address was found, store it
     if (auto const addr{decode_address(_deque.front().addr)})
@@ -219,7 +221,7 @@ private:
 
   /// Execute commands in service mode
   ///
-  /// \return false
+  /// \retval false
   bool executeService() {
     auto const [addr, func, data]{_deque.front()};
 
@@ -265,8 +267,8 @@ private:
 
   /// Execute commands in operations mode
   ///
-  /// \return true  Command to own address
-  /// \return false Command to other address
+  /// \retval true  Command to own address
+  /// \retval false Command to other address
   bool executeOperations() {
     auto const [addr, func, data]{_deque.front()};
     if (!addr) return false;  // Zero is no valid address
@@ -374,12 +376,12 @@ private:
   /// \param  fshift  0   Packet contains base address
   ///                 >0  Packet contains follow-up address
   /// \param  dir     Direction
-  void motorola2Direction(uint32_t addr, uint32_t fshift, int32_t dir) {
+  void motorola2Direction(uint32_t addr, uint32_t fshift, bool dir) {
     if (fshift) return;
     auto const reverse{addr == _addrs.primary
                          ? impl().readCv(29u - 1u) & ztl::make_mask(0u)
                          : impl().readCv(19u - 1u) & ztl::make_mask(7u)};
-    impl().direction(addr, reverse ? dir * -1 : dir);
+    impl().direction(addr, reverse ? !dir : dir);
   }
 
   /// Execute MM2 function
@@ -415,8 +417,8 @@ private:
 
   /// Check whether command is direction change
   ///
-  /// \return true  Command is direction change
-  /// \return false Command is not direction change
+  /// \retval true  Command is direction change
+  /// \retval false Command is not direction change
   bool isDirectionChange() const { return _deque.front().data == 0xC0u; }
 
   /// Check if address is a follow-up one. In case it is return a shift which

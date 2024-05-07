@@ -19,7 +19,7 @@ template<typename T>
 concept Decoder = Readable<T> && Writable<T> &&
                   requires(T t,
                            uint32_t addr,
-                           int32_t dir,
+                           bool dir,
                            int32_t speed,
                            uint32_t mask,
                            uint32_t state) {
