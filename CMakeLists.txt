@@ -4,7 +4,7 @@ include(FetchContent)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/CMakeModules"
-  GIT_TAG v0.8.0
+  GIT_TAG v0.9.1
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
@@ -41,6 +41,7 @@ target_link_libraries(MM2 INTERFACE ZTL::ZTL)
 
 if(PROJECT_IS_TOP_LEVEL)
   include(CTest)
+  add_subdirectory(examples)
   file(
     DOWNLOAD
     "https://github.com/ZIMO-Elektronik/.clang-format/raw/master/.clang-format"
@@ -50,6 +51,5 @@ if(PROJECT_IS_TOP_LEVEL)
 endif()
 
 if(BUILD_TESTING AND CMAKE_SYSTEM_NAME STREQUAL CMAKE_HOST_SYSTEM_NAME)
-  add_subdirectory(examples)
   add_subdirectory(tests)
 endif()

@@ -1,7 +1,11 @@
 # Changelog
 
+## 0.10.0
+- Replace `int32_t` direction (1, -1) with `bool` (1, 0)
+- Add `Direction` enumeration
+
 ## 0.9.0
-- Use 'speed' instead of 'notch'
+- Use `speed` instead of `notch`
 - Update to ZTL 0.18.0
 
 ## 0.8.9
@@ -14,8 +18,8 @@
 - Bugfix MM1/2 detection
 
 ## 0.8.6
-- time2bit returns Bit enum instead of std::optional (overhead is pretty significant)
-- Bugfix queue not popped in error path
+- `time2bit` returns `Bit` enum instead of `std::optional` (overhead is pretty significant)
+- Bugfix deque not popped in error path
 
 ## 0.8.5
 - Use CPM.cmake
