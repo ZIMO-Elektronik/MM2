@@ -36,7 +36,7 @@ private:
   uint8_t readCv(uint32_t cv_addr) {}
 
   // Write CV
-  uint8_t writeCv(uint32_t cv_addr, uint8_t value) {}
+  uint8_t writeCv(uint32_t cv_addr, uint8_t byte) {}
 
   // Timer interrupt calls receive with captured value
   void interrupt() {

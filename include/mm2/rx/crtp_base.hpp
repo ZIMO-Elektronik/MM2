@@ -20,6 +20,7 @@
 #include "../addresses.hpp"
 #include "../bit.hpp"
 #include "../direction.hpp"
+#include "../speed.hpp"
 #include "decoder.hpp"
 #include "packet.hpp"
 
@@ -78,7 +79,7 @@ constexpr std::optional<int32_t> decode_speed(uint8_t data) {
   uint32_t const value{
     (data & ztl::make_mask(7u)) >> 7u | (data & ztl::make_mask(5u)) >> 4u |
     (data & ztl::make_mask(3u)) >> 1u | (data & ztl::make_mask(1u)) << 2u};
-  if (value == 0u) return 0;
+  if (value == 0u) return Stop;
   if (value == 1u) return std::nullopt;
   return ztl::lerp<int32_t>(static_cast<int32_t>(value) - 1, 0, 14, 0, 255);
 }
