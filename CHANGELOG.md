@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.1
+- Bugfix CMake always includes tests
+
 ## 0.10.0
 - Replace `int32_t` direction (1, -1) with `bool` (1, 0)
 - Add `Direction` enumeration
