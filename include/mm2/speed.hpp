@@ -18,4 +18,4 @@ enum Speed : int32_t {
   Stop = 0,
 };
 
-}  // namespace mm2
+} // namespace mm2

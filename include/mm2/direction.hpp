@@ -17,4 +17,4 @@ enum Direction : bool {
   Backward = false,
 };
 
-}  // namespace mm2
+} // namespace mm2

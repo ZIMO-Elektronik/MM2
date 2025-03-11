@@ -165,7 +165,7 @@ struct CrtpBase {
         if (++_bit_count < 8uz) return;
         _state = State::Address;
         _bit_count = 0uz;
-        _deque.push_back();  // Successfully red a packet
+        _deque.push_back(); // Successfully red a packet
         break;
       }
     }
@@ -272,7 +272,7 @@ private:
   /// \retval false Command to other address
   bool executeOperations() {
     auto const [addr, func, data]{_deque.front()};
-    if (!addr) return false;  // Zero is no valid address
+    if (!addr) return false; // Zero is no valid address
 
     auto const fshift{fShift()};
 
@@ -449,8 +449,8 @@ private:
   }
 
   size_t _bit_count{};
-  ztl::inplace_deque<Packet, MM2_RX_DEQUE_SIZE> _deque{};  ///< Task queue
-  Packet _last_valid_own_packet{};  ///< Copy of last packet for own address
+  ztl::inplace_deque<Packet, MM2_RX_DEQUE_SIZE> _deque{}; ///< Task queue
+  Packet _last_valid_own_packet{}; ///< Copy of last packet for own address
 
   enum class State : uint8_t { Address, Function, Data } _state{};
   enum class Mode : uint8_t { Unknown, Service, Operations } _mode{};
@@ -466,11 +466,11 @@ private:
   // Not bitfields as those are most likely mutated in interrupt context
   bool _is_halfbit{};
 
-  uint8_t _follow_up_count : 2 {};  // Limit to 3x follow-up addresses
+  uint8_t _follow_up_count : 2 {}; // Limit to 3x follow-up addresses
   bool _enabled : 1 {};
   bool _last_cmd_was_dir_change : 1 {};
 };
 
-}  // namespace rx
+} // namespace rx
 
-}  // namespace mm2
+} // namespace mm2

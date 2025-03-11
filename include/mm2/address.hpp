@@ -44,7 +44,7 @@ inline constexpr std::array<Address, 256uz> address_table{
   0xFDu, 0xBDu, 0x2Du, 0xEDu, 0xADu, 0x09u, 0xC9u, 0x89u, 0x39u, 0xF9u, 0xB9u,
   0x29u, 0xE9u, 0xA9u};
 
-}  // namespace detail
+} // namespace detail
 
 /// Decode address
 ///
@@ -65,4 +65,4 @@ constexpr uint8_t encode_address(Address addr) {
   return detail::address_table[addr];
 }
 
-}  // namespace mm2
+} // namespace mm2

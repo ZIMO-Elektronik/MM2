@@ -26,4 +26,4 @@ constexpr Bit time2bit(uint32_t time) {
   else return Invalid;
 }
 
-}  // namespace mm2
+} // namespace mm2

@@ -21,4 +21,4 @@ struct Packet {
   constexpr bool operator==(Packet const&) const = default;
 };
 
-}  // namespace mm2::rx
+} // namespace mm2::rx

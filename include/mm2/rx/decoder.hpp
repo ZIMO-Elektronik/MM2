@@ -29,4 +29,4 @@ concept Decoder = Readable<T> && Writable<T> &&
                     { t.function(addr, mask, state) } -> std::same_as<void>;
                   };
 
-}  // namespace mm2::rx
+} // namespace mm2::rx

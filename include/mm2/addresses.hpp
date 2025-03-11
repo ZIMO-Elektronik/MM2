@@ -19,4 +19,4 @@ struct Addresses {
   Address consist{};
 };
 
-}  // namespace mm2
+} // namespace mm2
