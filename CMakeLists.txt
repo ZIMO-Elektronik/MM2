@@ -4,7 +4,7 @@ include(FetchContent)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/CMakeModules"
-  GIT_TAG v0.9.5
+  GIT_TAG v0.10.0
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
@@ -27,14 +27,14 @@ target_compile_definitions(MM2 INTERFACE MM2_RX_DEQUE_SIZE=${MM2_RX_DEQUE_SIZE})
 
 if(PROJECT_IS_TOP_LEVEL)
   target_include_directories(MM2 INTERFACE include)
+  target_common_warnings(MM2 INTERFACE)
+  target_common_errors(MM2 INTERFACE)
 else()
   target_include_directories(MM2 SYSTEM INTERFACE include)
 endif()
 
-target_common_warnings(MM2 INTERFACE)
-
 if(NOT TARGET ZTL::ZTL)
-  cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.21.1")
+  cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.23.1")
 endif()
 
 target_link_libraries(MM2 INTERFACE ZTL::ZTL)

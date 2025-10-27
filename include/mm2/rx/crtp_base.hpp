@@ -77,8 +77,8 @@ constexpr std::optional<bool> decode_direction(uint8_t data) {
 /// \retval std::nullopt  No speed
 constexpr std::optional<int32_t> decode_speed(uint8_t data) {
   uint32_t const value{
-    (data & ztl::make_mask(7u)) >> 7u | (data & ztl::make_mask(5u)) >> 4u |
-    (data & ztl::make_mask(3u)) >> 1u | (data & ztl::make_mask(1u)) << 2u};
+    (data & ztl::mask<7u>) >> 7u | (data & ztl::mask<5u>) >> 4u |
+    (data & ztl::mask<3u>) >> 1u | (data & ztl::mask<1u>) << 2u};
   if (value == 0u) return Stop;
   if (value == 1u) return std::nullopt;
   return ztl::lerp<int32_t>(static_cast<int32_t>(value) - 1, 0, 14, 0, 255);
@@ -287,7 +287,7 @@ private:
     }
 
     // Function
-    if (addr == _addrs.primary) impl().function(addr, ztl::make_mask(0u), func);
+    if (addr == _addrs.primary) impl().function(addr, ztl::mask<0u>, func);
 
     // MM1 or MM2
     if (auto const is_mm2{(data & 0b11'00'00'00u) == 0b01'00'00'00u ||
@@ -348,25 +348,21 @@ private:
   /// \param  exc     Exception
   void motorola2Exception(uint32_t addr, uint32_t fshift, uint32_t exc) {
     switch (exc) {
-      case 2u: impl().function(addr, ztl::make_mask(1u) << fshift, 0u); break;
-      case 3u: impl().function(addr, ztl::make_mask(2u) << fshift, 0u); break;
-      case 5u: impl().function(addr, ztl::make_mask(3u) << fshift, 0u); break;
-      case 6u: impl().function(addr, ztl::make_mask(4u) << fshift, 0u); break;
+      case 2u: impl().function(addr, ztl::mask<1u> << fshift, 0u); break;
+      case 3u: impl().function(addr, ztl::mask<2u> << fshift, 0u); break;
+      case 5u: impl().function(addr, ztl::mask<3u> << fshift, 0u); break;
+      case 6u: impl().function(addr, ztl::mask<4u> << fshift, 0u); break;
       case 10u:
-        impl().function(
-          addr, ztl::make_mask(1u) << fshift, ztl::make_mask(1u) << fshift);
+        impl().function(addr, ztl::mask<1u> << fshift, ztl::mask<1u> << fshift);
         break;
       case 11u:
-        impl().function(
-          addr, ztl::make_mask(2u) << fshift, ztl::make_mask(2u) << fshift);
+        impl().function(addr, ztl::mask<2u> << fshift, ztl::mask<2u> << fshift);
         break;
       case 13u:
-        impl().function(
-          addr, ztl::make_mask(3u) << fshift, ztl::make_mask(3u) << fshift);
+        impl().function(addr, ztl::mask<3u> << fshift, ztl::mask<3u> << fshift);
         break;
       case 14u:
-        impl().function(
-          addr, ztl::make_mask(4u) << fshift, ztl::make_mask(4u) << fshift);
+        impl().function(addr, ztl::mask<4u> << fshift, ztl::mask<4u> << fshift);
         break;
     }
   }
@@ -380,8 +376,8 @@ private:
   void motorola2Direction(uint32_t addr, uint32_t fshift, bool dir) {
     if (fshift) return;
     auto const reverse{addr == _addrs.primary
-                         ? impl().readCv(29u - 1u) & ztl::make_mask(0u)
-                         : impl().readCv(19u - 1u) & ztl::make_mask(7u)};
+                         ? impl().readCv(29u - 1u) & ztl::mask<0u>
+                         : impl().readCv(19u - 1u) & ztl::mask<7u>};
     impl().direction(addr, reverse ? !dir : dir);
   }
 
@@ -395,23 +391,23 @@ private:
     switch (data & efgh_mask(0b1110u)) {
       case efgh_mask(0b1100u):
         impl().function(addr,
-                        ztl::make_mask(1u) << fshift,
-                        data & 0b1u ? ztl::make_mask(1u) << fshift : 0u);
+                        ztl::mask<1u> << fshift,
+                        data & 0b1u ? ztl::mask<1u> << fshift : 0u);
         break;
       case efgh_mask(0b0010u):
         impl().function(addr,
-                        ztl::make_mask(2u) << fshift,
-                        data & 0b1u ? ztl::make_mask(2u) << fshift : 0u);
+                        ztl::mask<2u> << fshift,
+                        data & 0b1u ? ztl::mask<2u> << fshift : 0u);
         break;
       case efgh_mask(0b0110u):
         impl().function(addr,
-                        ztl::make_mask(3u) << fshift,
-                        data & 0b1u ? ztl::make_mask(3u) << fshift : 0u);
+                        ztl::mask<3u> << fshift,
+                        data & 0b1u ? ztl::mask<3u> << fshift : 0u);
         break;
       case efgh_mask(0b1110u):
         impl().function(addr,
-                        ztl::make_mask(4u) << fshift,
-                        data & 0b1u ? ztl::make_mask(4u) << fshift : 0u);
+                        ztl::mask<4u> << fshift,
+                        data & 0b1u ? ztl::mask<4u> << fshift : 0u);
         break;
     }
   }
