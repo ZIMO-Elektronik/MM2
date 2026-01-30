@@ -10,7 +10,9 @@
 
 #pragma once
 
+#include <array>
 #include <cstdint>
+#include <optional>
 
 namespace mm2 {
 
