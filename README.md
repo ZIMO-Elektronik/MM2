@@ -8,7 +8,7 @@ MM2 is an implementation of the Motorola 1 and 2 (MM1/2) protocol. Details on th
 
 ## Examples
 Currently there is only one class for receiving MM2.
-- mm2::rx::CrtpBase
+- `mm2::rx::CrtpBase`
 
 As the names suggest this class relies on [CRTP](https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) to implement static polymorphism. The template argument of the base classes is checked with a concept called Decoder.
 
@@ -21,16 +21,16 @@ struct Mm2 : mm2::rx::CrtpBase<Mm2> {
 
 private:
   // Set direction (1 forward, 0 backward)
-  void direction(uint32_t addr, bool dir) {}
+  void direction(uint8_t addr, bool dir) {}
 
   // Set speed [0, 255] (regardless of CV settings)
-  void speed(uint32_t addr, int32_t speed) {}
+  void speed(uint8_t addr, int32_t speed) {}
 
   // Reverse direction
-  void reverse(uint32_t addr) {}
+  void reverse(uint8_t addr) {}
 
   // Set function inputs
-  void function(uint32_t addr, uint32_t mask, uint32_t state) {}
+  void function(uint8_t addr, uint32_t mask, uint32_t state) {}
 
   // Read CV
   uint8_t readCv(uint32_t cv_addr) {}

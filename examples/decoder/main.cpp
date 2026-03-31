@@ -5,16 +5,16 @@ struct Mm2 : mm2::rx::CrtpBase<Mm2> {
 
 private:
   // Set direction (1 forward, 0 backward)
-  void direction(uint32_t addr, bool dir) {}
+  void direction(uint8_t addr, bool dir) {}
 
   // Set speed [0, 255] (regardless of CV settings)
-  void speed(uint32_t addr, int32_t speed) {}
+  void speed(uint8_t addr, int32_t speed) {}
 
   // Reverse direction
-  void reverse(uint32_t addr) {}
+  void reverse(uint8_t addr) {}
 
   // Set function inputs
-  void function(uint32_t addr, uint32_t mask, uint32_t state) {}
+  void function(uint8_t addr, uint32_t mask, uint32_t state) {}
 
   // Read CV
   uint8_t readCv(uint32_t cv_addr) { return {}; }
