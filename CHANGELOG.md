@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.2
+- Update to ZTL 0.25.0
+
 ## 0.10.1
 - Bugfix CMake always includes tests
 
