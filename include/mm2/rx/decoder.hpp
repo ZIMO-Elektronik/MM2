@@ -23,8 +23,8 @@ concept Decoder =
     T t, uint8_t addr, bool dir, int32_t speed, uint32_t mask, uint32_t state) {
     { t.direction(addr, dir) } -> std::same_as<void>;
     { t.speed(addr, speed) } -> std::same_as<void>;
-    { t.reverse(addr) } -> std::same_as<void>;
     { t.function(addr, mask, state) } -> std::same_as<void>;
+    { t.reverse(addr) } -> std::same_as<void>;
   };
 
 } // namespace mm2::rx

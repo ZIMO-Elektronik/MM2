@@ -4,7 +4,7 @@ include(FetchContent)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/CMakeModules"
-  GIT_TAG v0.12.3
+  GIT_TAG v0.12.4
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
