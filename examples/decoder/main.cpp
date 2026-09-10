@@ -1,7 +1,7 @@
 #include <mm2/mm2.hpp>
 
-struct Mm2 : mm2::rx::CrtpBase<Mm2> {
-  friend mm2::rx::CrtpBase<Mm2>;
+struct Mm2 : mm2::rx::Base {
+  friend mm2::rx::Base;
 
 private:
   // Set direction (1 forward, 0 backward)

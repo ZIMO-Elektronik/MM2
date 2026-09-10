@@ -10,4 +10,4 @@
 
 #pragma once
 
-#include "rx/crtp_base.hpp"
+#include "rx/base.hpp"
