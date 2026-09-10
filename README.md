@@ -8,16 +8,16 @@ MM2 is an implementation of the Motorola 1 and 2 (MM1/2) protocol. Details on th
 
 ## Examples
 Currently there is only one class for receiving MM2.
-- `mm2::rx::CrtpBase`
+- `mm2::rx::Base`
 
-As the names suggest this class relies on [CRTP](https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) to implement static polymorphism. The template argument of the base classes is checked with a concept called Decoder.
+The class relies on [deducing **this**](https://cppreference.com/cpp/language/function#Explicit_object_parameter) to implement static polymorphism. The explicit object parameter in the base is checked with a concept called [Decoder](include/mm2/rx/decoder.hpp).
 
 Here is an example for how a class which implements it might look. The friend declarations are only necessary if the methods the base(s) need to call are not public.
 ```cpp
 #include <mm2/mm2.hpp>
 
-struct Mm2 : mm2::rx::CrtpBase<Mm2> {
-  friend mm2::rx::CrtpBase<Mm2>;
+struct Mm2 : mm2::rx::Base {
+  friend mm2::rx::Base;
 
 private:
   // Set direction (1 forward, 0 backward)

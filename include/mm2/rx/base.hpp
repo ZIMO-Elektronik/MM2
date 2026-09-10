@@ -4,7 +4,7 @@
 
 /// Receive base
 ///
-/// \file   mm2/rx/crtp_base.hpp
+/// \file   mm2/rx/base.hpp
 /// \author Vincent Hamp
 /// \date   29/11/2022
 
@@ -105,15 +105,10 @@ constexpr std::optional<uint32_t> decode_exception(uint8_t data) {
 
 namespace rx {
 
-/// CRTP base for receiving MM/MM2
-///
-/// \tparam T Type to downcast to
-template<typename T>
-struct CrtpBase {
-  friend T;
-
+/// Base for receiving MM/MM2
+struct Base {
   /// Initialize
-  void init() { config(); }
+  void init(this Decoder auto&& self) { self.config(); }
 
   /// Enable
   void enable() {
@@ -175,11 +170,11 @@ struct CrtpBase {
   ///
   /// \retval true  Command to own address
   /// \retval false Command to other address
-  bool execute() {
-    if (empty(_deque)) return false;
-    auto const retval{executeThreadMode()};
-    _deque.front() = {};
-    _deque.pop_front();
+  bool execute(this Decoder auto&& self) {
+    if (empty(self._deque)) return false;
+    auto const retval{self.executeThreadMode()};
+    self._deque.front() = {};
+    self._deque.pop_front();
     return retval;
   }
 
@@ -189,77 +184,78 @@ struct CrtpBase {
   /// \retval false Operations mode active
   bool serviceMode() const { return _mode == Mode::Service; }
 
-private:
-  constexpr CrtpBase() = default;
-  Decoder auto& impl() { return static_cast<T&>(*this); }
-  Decoder auto const& impl() const { return static_cast<T const&>(*this); }
+protected:
+  constexpr Base() = default;
 
+private:
   /// Configure
-  void config() {
-    _addrs = {.primary = impl().readCv(1u - 1u),
-              .consist = impl().readCv(19u - 1u) & 0b0111'1111u};
-    _follow_up_count = impl().readCv(10u - 1u) & 0b11u;
+  void config(this Decoder auto&& self) {
+    self._addrs = {.primary = self.readCv(1u - 1u),
+                   .consist = self.readCv(19u - 1u) & 0b0111'1111u};
+    self._follow_up_count = self.readCv(10u - 1u) & 0b11u;
   }
 
   /// Execute in thread mode
   ///
   /// \retval true  Command to own address
   /// \retval false Command to other address
-  bool executeThreadMode() {
+  bool executeThreadMode(this Decoder auto&& self) {
     // If address was found, store it
-    if (auto const addr{decode_address(_deque.front().addr)})
-      _deque.front().addr = *addr;
+    if (auto const addr{decode_address(self._deque.front().addr)})
+      self._deque.front().addr = *addr;
     else return false;
 
-    switch (_mode) {
+    switch (self._mode) {
       case Mode::Unknown:
-        if (isDirectionChange()) _mode = Mode::Service;
+        if (self.isDirectionChange()) self._mode = Mode::Service;
         [[fallthrough]];
-      case Mode::Service: return executeService();
-      case Mode::Operations: return executeOperations();
+      case Mode::Service: return self.executeService();
+      case Mode::Operations: return self.executeOperations();
     }
   }
 
   /// Execute commands in service mode
   ///
   /// \retval false
-  bool executeService() {
-    auto const [addr, func, data]{_deque.front()};
+  bool executeService(this Decoder auto&& self) {
+    auto const [addr, func, data]{self._deque.front()};
 
     // Check if address is either 0, 80 or primary address
     auto is_addr{
-      [&] { return addr == 0u || addr == 80u || addr == _addrs.primary; }};
+      [&] { return addr == 0u || addr == 80u || addr == self._addrs.primary; }};
 
-    switch (_prog.state) {
+    switch (self._prog.state) {
       case Prog::Entry:
         if (is_addr() && data == 0u) break;
-        else if (is_addr() && isDirectionChange()) _prog.state = Prog::Wait0_1;
-        else _mode = Mode::Operations;
+        else if (is_addr() && self.isDirectionChange())
+          self._prog.state = Prog::Wait0_1;
+        else self._mode = Mode::Operations;
         break;
 
       case Prog::Wait0_1:
-        if (is_addr() && isDirectionChange()) break;
-        else if (is_addr() && !isDirectionChange()) _prog.state = Prog::Address;
+        if (is_addr() && self.isDirectionChange()) break;
+        else if (is_addr() && !self.isDirectionChange())
+          self._prog.state = Prog::Address;
         break;
 
       case Prog::Address:
-        if (is_addr() && !isDirectionChange()) break;
-        else if (isDirectionChange()) {
-          _prog.addr = addr;
-          _prog.state = Prog::Wait0_2;
+        if (is_addr() && !self.isDirectionChange()) break;
+        else if (self.isDirectionChange()) {
+          self._prog.addr = addr;
+          self._prog.state = Prog::Wait0_2;
         }
         break;
 
       case Prog::Wait0_2:
-        if (isDirectionChange()) break;
-        _prog.state = Prog::Value;
+        if (self.isDirectionChange()) break;
+        self._prog.state = Prog::Value;
         break;
 
       case Prog::Value:
-        if (!isDirectionChange()) break;
-        _prog.value = addr;
-        _prog.state = Prog::Wait0_1;
-        impl().writeCv(_prog.addr - 1u, _prog.value);
+        if (!self.isDirectionChange()) break;
+        self._prog.value = addr;
+        self._prog.state = Prog::Wait0_1;
+        self.writeCv(self._prog.addr - 1u, self._prog.value);
         break;
     }
 
@@ -270,24 +266,24 @@ private:
   ///
   /// \retval true  Command to own address
   /// \retval false Command to other address
-  bool executeOperations() {
-    auto const [addr, func, data]{_deque.front()};
+  bool executeOperations(this Decoder auto&& self) {
+    auto const [addr, func, data]{self._deque.front()};
     if (!addr) return false; // Zero is no valid address
 
-    auto const fshift{fShift()};
+    auto const fshift{self.fShift()};
 
     // Address check
-    if (addr != _addrs.primary && addr != _addrs.consist && !fshift)
+    if (addr != self._addrs.primary && addr != self._addrs.consist && !fshift)
       return false;
 
     // Valid packets must be received twice
-    if (_last_valid_own_packet != _deque.front()) {
-      _last_valid_own_packet = _deque.front();
+    if (self._last_valid_own_packet != self._deque.front()) {
+      self._last_valid_own_packet = self._deque.front();
       return true;
     }
 
     // Function
-    if (addr == _addrs.primary) impl().function(addr, ztl::mask<0u>, func);
+    if (addr == self._addrs.primary) self.function(addr, ztl::mask<0u>, func);
 
     // MM1 or MM2
     if (auto const is_mm2{(data & 0b11'00'00'00u) == 0b01'00'00'00u ||
@@ -295,24 +291,24 @@ private:
                           (data & 0b00'00'11'00u) == 0b00'00'01'00u ||
                           (data & 0b00'00'00'11u) == 0b00'00'00'01u}) {
       // Follow-up address needs to act like normal one
-      uint32_t const addr_to_fwd{_deque.front().addr - (fshift >> 2u)};
-      motorola2(addr_to_fwd, fshift);
-    } else if (!fshift) motorola1();
+      uint32_t const addr_to_fwd{self._deque.front().addr - (fshift >> 2u)};
+      self.motorola2(addr_to_fwd, fshift);
+    } else if (!fshift) self.motorola1();
 
     return true;
   }
 
   /// Execute MM1 command
-  void motorola1() {
-    auto const addr{_deque.front().addr}, data{_deque.front().data};
+  void motorola1(this Decoder auto&& self) {
+    auto const [addr, _, data]{self._deque.front()};
     if (auto const speed{decode_speed(data)}) {
-      _last_cmd_was_dir_change = false;
-      impl().speed(addr, *speed);
+      self._last_cmd_was_dir_change = false;
+      self.speed(addr, *speed);
     }
     // Direction
-    else if (!_last_cmd_was_dir_change) {
-      _last_cmd_was_dir_change = true;
-      impl().reverse(addr);
+    else if (!self._last_cmd_was_dir_change) {
+      self._last_cmd_was_dir_change = true;
+      self.reverse(addr);
     }
   }
 
@@ -321,23 +317,23 @@ private:
   /// \param  addr    Address
   /// \param  fshift  0   Packet contains base address
   ///                 >0  Packet contains follow-up address
-  void motorola2(uint32_t addr, uint32_t fshift) {
-    auto const data{_deque.front().data};
+  void motorola2(this Decoder auto&& self, uint32_t addr, uint32_t fshift) {
+    auto const data{self._deque.front().data};
 
     // Command is either exception
     if (auto const exc{decode_exception(data)})
-      motorola2Exception(addr, fshift, *exc);
+      self.motorola2Exception(addr, fshift, *exc);
     else {
       // ... or direction
       if (auto const dir{decode_direction(data)})
-        motorola2Direction(addr, fshift, *dir);
+        self.motorola2Direction(addr, fshift, *dir);
       // ... or function
-      else motorola2Function(addr, fshift, data);
+      else self.motorola2Function(addr, fshift, data);
     }
 
     // Speed, ignore direction changes
     if (auto const speed{decode_speed(data)}; speed && !fshift)
-      impl().speed(addr, *speed);
+      self.speed(addr, *speed);
   }
 
   /// Execute MM2 exception
@@ -346,23 +342,26 @@ private:
   /// \param  fshift  0   Packet contains base address
   ///                 >0  Packet contains follow-up address
   /// \param  exc     Exception
-  void motorola2Exception(uint32_t addr, uint32_t fshift, uint32_t exc) {
+  void motorola2Exception(this Decoder auto&& self,
+                          uint32_t addr,
+                          uint32_t fshift,
+                          uint32_t exc) {
     switch (exc) {
-      case 2u: impl().function(addr, ztl::mask<1u> << fshift, 0u); break;
-      case 3u: impl().function(addr, ztl::mask<2u> << fshift, 0u); break;
-      case 5u: impl().function(addr, ztl::mask<3u> << fshift, 0u); break;
-      case 6u: impl().function(addr, ztl::mask<4u> << fshift, 0u); break;
+      case 2u: self.function(addr, ztl::mask<1u> << fshift, 0u); break;
+      case 3u: self.function(addr, ztl::mask<2u> << fshift, 0u); break;
+      case 5u: self.function(addr, ztl::mask<3u> << fshift, 0u); break;
+      case 6u: self.function(addr, ztl::mask<4u> << fshift, 0u); break;
       case 10u:
-        impl().function(addr, ztl::mask<1u> << fshift, ztl::mask<1u> << fshift);
+        self.function(addr, ztl::mask<1u> << fshift, ztl::mask<1u> << fshift);
         break;
       case 11u:
-        impl().function(addr, ztl::mask<2u> << fshift, ztl::mask<2u> << fshift);
+        self.function(addr, ztl::mask<2u> << fshift, ztl::mask<2u> << fshift);
         break;
       case 13u:
-        impl().function(addr, ztl::mask<3u> << fshift, ztl::mask<3u> << fshift);
+        self.function(addr, ztl::mask<3u> << fshift, ztl::mask<3u> << fshift);
         break;
       case 14u:
-        impl().function(addr, ztl::mask<4u> << fshift, ztl::mask<4u> << fshift);
+        self.function(addr, ztl::mask<4u> << fshift, ztl::mask<4u> << fshift);
         break;
     }
   }
@@ -373,12 +372,15 @@ private:
   /// \param  fshift  0   Packet contains base address
   ///                 >0  Packet contains follow-up address
   /// \param  dir     Direction
-  void motorola2Direction(uint32_t addr, uint32_t fshift, bool dir) {
+  void motorola2Direction(this Decoder auto&& self,
+                          uint32_t addr,
+                          uint32_t fshift,
+                          bool dir) {
     if (fshift) return;
-    auto const reverse{addr == _addrs.primary
-                         ? impl().readCv(29u - 1u) & ztl::mask<0u>
-                         : impl().readCv(19u - 1u) & ztl::mask<7u>};
-    impl().direction(addr, reverse ? !dir : dir);
+    auto const reverse{addr == self._addrs.primary
+                         ? self.readCv(29u - 1u) & ztl::mask<0u>
+                         : self.readCv(19u - 1u) & ztl::mask<7u>};
+    self.direction(addr, reverse ? !dir : dir);
   }
 
   /// Execute MM2 function
@@ -387,27 +389,30 @@ private:
   /// \param  fshift  0   Packet contains base address
   ///                 >0  Packet contains follow-up address
   /// \param  data    Data
-  void motorola2Function(uint32_t addr, uint32_t fshift, uint8_t data) {
+  void motorola2Function(this Decoder auto&& self,
+                         uint32_t addr,
+                         uint32_t fshift,
+                         uint8_t data) {
     switch (data & efgh_mask(0b1110u)) {
       case efgh_mask(0b1100u):
-        impl().function(addr,
-                        ztl::mask<1u> << fshift,
-                        data & 0b1u ? ztl::mask<1u> << fshift : 0u);
+        self.function(addr,
+                      ztl::mask<1u> << fshift,
+                      data & 0b1u ? ztl::mask<1u> << fshift : 0u);
         break;
       case efgh_mask(0b0010u):
-        impl().function(addr,
-                        ztl::mask<2u> << fshift,
-                        data & 0b1u ? ztl::mask<2u> << fshift : 0u);
+        self.function(addr,
+                      ztl::mask<2u> << fshift,
+                      data & 0b1u ? ztl::mask<2u> << fshift : 0u);
         break;
       case efgh_mask(0b0110u):
-        impl().function(addr,
-                        ztl::mask<3u> << fshift,
-                        data & 0b1u ? ztl::mask<3u> << fshift : 0u);
+        self.function(addr,
+                      ztl::mask<3u> << fshift,
+                      data & 0b1u ? ztl::mask<3u> << fshift : 0u);
         break;
       case efgh_mask(0b1110u):
-        impl().function(addr,
-                        ztl::mask<4u> << fshift,
-                        data & 0b1u ? ztl::mask<4u> << fshift : 0u);
+        self.function(addr,
+                      ztl::mask<4u> << fshift,
+                      data & 0b1u ? ztl::mask<4u> << fshift : 0u);
         break;
     }
   }
@@ -429,7 +434,7 @@ private:
     if (!addr) return 0u;
     // Check if address is one of three chaining addresses
     for (auto i{_follow_up_count}; i; --i)
-      if (addr == _addrs.primary + i) return i << 2u;
+      if (addr == _addrs.primary + i) return static_cast<uint32_t>(i) << 2u;
     return 0u;
   }
 
