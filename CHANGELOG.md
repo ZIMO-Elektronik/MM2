@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.11.0
-- Switch from [CRTP](https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) to [decuding **this**](https://cppreference.com/cpp/language/function#Explicit_object_parameter) ([#56](https://github.com/ZIMO-Elektronik/MM2/issues/5))
+- Switch from [CRTP](https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) to [deducing **this**](https://cppreference.com/cpp/language/function#Explicit_object_parameter) ([#56](https://github.com/ZIMO-Elektronik/MM2/issues/5))
 
 ## 0.10.2
 - Update to ZTL 0.25.0
