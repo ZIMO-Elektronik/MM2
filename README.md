@@ -12,12 +12,12 @@ Currently there is only one class for receiving MM2.
 
 The class relies on [deducing **this**](https://cppreference.com/cpp/language/function#Explicit_object_parameter) to implement static polymorphism. The explicit object parameter in the base is checked with a concept called [Decoder](include/mm2/rx/decoder.hpp).
 
-Here is an example for how a class which implements it might look. The friend declarations are only necessary if the methods the base(s) need to call are not public.
+Here is an example of a class which implements the Decoder concept.
 ```cpp
 #include <mm2/mm2.hpp>
 
 struct Mm2 : mm2::rx::Base {
-  friend mm2::rx::Base;
+  friend mm2::rx::Base; // Only necessary if methods called from base are private
 
 private:
   // Set direction (1 forward, 0 backward)
